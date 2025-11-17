@@ -1,17 +1,17 @@
+// Fichier: ../components/AppHeader.js
+
 import { Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const AppHeader = ({ navigation }) => {
     return (
-        // L'en-tête est positionné en absolu pour flotter sur le contenu de la bannière
-        // Si vous le préférez, vous pouvez le laisser en position normale (dans le flux).
-        // Ici, nous le faisons normal pour la simplicité, mais avec un grand padding supérieur
-        // pour que le contenu ne soit pas masqué.
-        <View className="flex-row items-center justify-between p-4 bg-transparent absolute top-0 w-full z-10">
+        // 🚨 CHANGEMENT : bg-transparent pour voir la bannière en dessous
+        <View className="flex-row items-center justify-between px-4 py-4 bg-transparent w-full">
 
             {/* 1. Bouton Menu (à gauche) */}
             <TouchableOpacity onPress={() => console.log('Ouvrir Menu')}>
-                <Icon name="menu-outline" size={30} color="#FFFFFF" />
+                {/* 🚨 OPTIMISATION : Menu icône plus simple pour le style Netflix */}
+                <Icon name="menu-outline" size={32} color="#FFFFFF" />
             </TouchableOpacity>
 
             {/* 2. Logo Central */}
@@ -20,7 +20,7 @@ const AppHeader = ({ navigation }) => {
             </Text>
 
             {/* 3. Bouton Recherche (à droite) */}
-            <TouchableOpacity onPress={() => navigation.navigate('Search')}>
+            <TouchableOpacity onPress={() => navigation.navigate('SearchTab')}>
                 <Icon name="search-outline" size={26} color="#FFFFFF" />
             </TouchableOpacity>
         </View>

@@ -6,8 +6,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import CastRow from '../components/CastRow';
 import Row from '../components/Row';
 
-// MOCK DATA pour l'exemple
+// MOCK DATA (Le reste des données reste identique)
 const mockDetail = {
+    // ... vos données mockées ...
     id: 1,
     title: "Le Cœur de l'Afrique",
     year: 2024,
@@ -23,15 +24,15 @@ const mockDetail = {
 const mockSimilarMedia = [
     { id: 10, title: "Film Similaire 1", poster_url: 'https://via.placeholder.com/150x225/B82329/FFFFFF?text=S1' },
     { id: 11, title: "Série Similaire 2", poster_url: 'https://via.placeholder.com/150x225/404040/FFFFFF?text=S2' },
-    { id: 12, title: "Docu Similaire 3", poster_url: 'https://via.placeholder.com/150x225/222222/FFFFFF?text=S3' },
+    { id: 12, title: "Docu Similaire 3", poster_url: 'https://via.placeholder.com/150x222/222222/FFFFFF?text=S3' },
 ];
+
 
 const DetailScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { id } = route.params; // Récupère l'ID passé par la navigation
+    const { id } = route.params;
 
-    // En production, vous feriez ici un appel API pour charger les détails basés sur 'id'
     const media = mockDetail;
 
     return (
@@ -41,50 +42,62 @@ const DetailScreen = () => {
             <ScrollView className="flex-1">
 
                 {/* --- 1. Bannière du Contenu et En-tête de Retour --- */}
-                <View className="w-full h-[300px] relative">
+                <View className="w-full h-[450px] relative"> {/* ⬅️ Augmenter la hauteur pour plus d'impact */}
                     <Image
                         source={{ uri: media.backdrop_url }}
                         className="w-full h-full"
                         resizeMode="cover"
                     />
 
-                    {/* Dégradé pour le contraste du Header */}
-                    <View className="absolute inset-0 bg-gradient-to-t from-black/20 to-black/60" />
+                    {/* Dégradé PLUS PRONONCÉ et étendu (du bas vers le haut) */}
+                    <View className="absolute inset-0">
+                        {/* Dégradé bas : essentiel pour fusionner avec le fond noir */}
+                        <View className="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-black to-transparent" />
+                        {/* Dégradé haut : pour contraster le header */}
+                        <View className="absolute top-0 w-full h-1/4 bg-gradient-to-b from-black/80 to-transparent" />
+                    </View>
 
-                    {/* Header de retour */}
-                    <View className="absolute top-0 w-full p-4 flex-row justify-between items-center mt-6">
+
+                    {/* Header de retour (maintenu en absolu) */}
+                    <View className="absolute top-0 w-full p-4 flex-row justify-between items-center mt-6 z-10"> {/* ⬅️ Ajout de z-10 */}
                         <TouchableOpacity onPress={() => navigation.goBack()} className="p-1">
                             <Icon name="arrow-back-outline" size={30} color="#FFFFFF" />
                         </TouchableOpacity>
 
-                        {/* Logo Central (Optionnel, vous pouvez le mettre ou le titre) */}
                         <Text className="text-white text-xl font-bold">
                             Media<Text className="text-red-600">243</Text>
                         </Text>
 
-                        <View className="w-8" /> {/* Espaceur */}
+                        <View className="w-8" />
                     </View>
                 </View>
 
                 {/* --- 2. Informations et Boutons --- */}
-                <View className="p-4 -mt-20"> {/* Remonte légèrement pour chevaucher la bannière */}
-                    <Text className="text-white text-3xl font-extrabold mb-1">
-                        {media.title}
-                    </Text>
+                {/* ⬅️ Réduire le chevauchement et ajouter du padding latéral pour le titre */}
+                <View className="p-4 -mt-16">
 
-                    {/* Métadonnées (Année, Note) */}
-                    <View className="flex-row items-center mb-4">
-                        <Text className="text-gray-400 font-semibold mr-4">{media.year}</Text>
+                    {/* Le titre est maintenant centré par rapport à la zone de chevauchement */}
+                    <View className="pb-4">
+                        <Text className="text-white text-4xl font-extrabold mb-2"> {/* ⬅️ Plus grand titre */}
+                            {media.title}
+                        </Text>
 
-                        {/* Note avec icône de flamme */}
-                        <View className="flex-row items-center bg-gray-700/50 rounded-full px-3 py-1">
-                            <Icon name="star" size={14} color="#FFD700" className="mr-1" />
-                            <Text className="text-white text-sm font-bold mr-1">{media.rating}</Text>
-                            <Icon name="flame" size={14} color="#FF4500" />
+                        {/* Métadonnées (Année, Note) */}
+                        <View className="flex-row items-center">
+                            {/* ⬅️ Utiliser un petit espacement entre les éléments */}
+                            <Text className="text-gray-400 font-semibold mr-3 text-sm">{media.year}</Text>
+                            <Text className="text-gray-400 font-semibold mr-3 text-sm">Action, Drame</Text>
+
+                            {/* Note avec icône de flamme */}
+                            <View className="flex-row items-center">
+                                <Icon name="star" size={16} color="#FFD700" className="mr-1" />
+                                <Text className="text-white text-base font-bold mr-1">{media.rating}</Text>
+                            </View>
                         </View>
                     </View>
 
-                    {/* Boutons d'Action */}
+
+                    {/* Boutons d'Action (maintenus pour le style Netflix) */}
                     <View className="flex-row mb-6">
                         <TouchableOpacity
                             onPress={() => console.log('Lancer la lecture')}
@@ -94,16 +107,25 @@ const DetailScreen = () => {
                             <Text className="text-white text-lg font-bold">Play Now</Text>
                         </TouchableOpacity>
 
+                        {/* Bouton pour 'Ma Liste' avec l'icône de partage/téléchargement pour plus de fonctionnalités Netflix-like */}
                         <TouchableOpacity
                             onPress={() => console.log('Ajouter à la liste')}
-                            className="flex-row items-center justify-center border border-gray-600 rounded-lg py-3 px-6 bg-gray-800/70"
+                            className="flex-col items-center justify-center p-3 bg-gray-800/70 rounded-lg ml-2"
                         >
-                            <Icon name="add-outline" size={20} color="#FFFFFF" />
+                            <Icon name="add-outline" size={24} color="#FFFFFF" />
+                            <Text className="text-gray-400 text-xs mt-1">Ma Liste</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => console.log('Télécharger')}
+                            className="flex-col items-center justify-center p-3 bg-gray-800/70 rounded-lg ml-2"
+                        >
+                            <Icon name="download-outline" size={24} color="#FFFFFF" />
+                            <Text className="text-gray-400 text-xs mt-1">Télécharger</Text>
                         </TouchableOpacity>
                     </View>
 
                     {/* --- 3. Synopsis --- */}
-                    <Text className="text-white text-lg font-bold mb-2">Synopsis</Text>
+                    <Text className="text-white text-lg font-bold mb-2 mt-4">Synopsis</Text>
                     <Text className="text-gray-300 text-base leading-relaxed mb-6">
                         {media.synopsis}
                     </Text>

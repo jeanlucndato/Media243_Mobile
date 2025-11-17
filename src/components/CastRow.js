@@ -4,7 +4,7 @@ const CastMember = ({ member }) => (
     <TouchableOpacity className="items-center mr-4 w-20">
         <Image
             source={{ uri: member.photo_url }}
-            className="w-16 h-16 rounded-full border-2 border-red-600 mb-1" // Cercle + bordure rouge
+            className="w-16 h-16 rounded-full border-2 border-red-600 mb-1"
             resizeMode="cover"
         />
         <Text

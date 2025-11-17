@@ -6,7 +6,7 @@ const HeroBanner = ({ media, onPlayPress, onInfoPress }) => {
     // Si aucune image n'est fournie, affichez un fond sombre par défaut
     const backgroundSource = media.backgroundImage
         ? { uri: media.backgroundImage }
-        : require('../../assets/default-banner.png'); // Mettez votre chemin d'image par défaut ici
+        : require('../../assets/images/SNORT.jpg'); // Mettez votre chemin d'image par défaut ici
 
     return (
         // 1. Conteneur principal avec hauteur définie
