@@ -1,115 +1,60 @@
-import { Ionicons } from '@expo/vector-icons';
-import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-// Placeholder pour l'image de fond
-const DEFAULT_BACKGROUND = 'https://via.placeholder.com/1080x600/1C1C1C/FFFFFF?text=Bannière+Principale';
+import { ImageBackground, Text, TouchableOpacity, View } from 'react-native';
+// Assurez-vous d'avoir installé react-native-vector-icons
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const HeroBanner = ({ media, onPlayPress, onInfoPress }) => {
-    // Utiliser un mock si 'media' n'est pas fourni (pour le développement)
-    const currentMedia = media || {
-        title: "Le Cœur de l'Afrique",
-        description: "Plongez dans un drame historique captivant sur les rives du lac Kivu. Un Media243 Original à ne pas manquer.",
-        backgroundImage: DEFAULT_BACKGROUND,
-        rating: '9.2',
-        genre: 'Drame, Historique',
-    };
+    // Si aucune image n'est fournie, affichez un fond sombre par défaut
+    const backgroundSource = media.backgroundImage
+        ? { uri: media.backgroundImage }
+        : require('../../assets/default-banner.png'); // Mettez votre chemin d'image par défaut ici
 
     return (
-        <ImageBackground
-            source={{ uri: currentMedia.backgroundImage }}
-            style={styles.container}
-            resizeMode="cover"
-        >
-            {/* Gradient pour améliorer la lisibilité du texte */}
-            <View style={styles.gradientOverlay} />
+        // 1. Conteneur principal avec hauteur définie
+        <View className="w-full h-[550px] bg-gray-900">
+            <ImageBackground
+                source={backgroundSource}
+                resizeMode="cover"
+                className="flex-1 justify-end"
+            >
+                {/* 2. Dégradé sombre pour améliorer la lisibilité du texte inférieur */}
+                <View className="absolute inset-0 bg-black/30">
+                    <View className="flex-1 justify-end p-6">
 
-            <View style={styles.content}>
-                <Text style={styles.title}>{currentMedia.title}</Text>
-                <Text style={styles.infoText}>{currentMedia.rating} | {currentMedia.genre}</Text>
+                        {/* 3. Titre du Contenu */}
+                        <Text className="text-white text-4xl font-extrabold mb-2" numberOfLines={2}>
+                            {media.title || "Titre du Média"}
+                        </Text>
 
-                <View style={styles.buttonContainer}>
-                    {/* Bouton PRINCIPAL : Lire/Play */}
-                    <TouchableOpacity style={styles.playButton} onPress={onPlayPress}>
-                        <Ionicons name="play" size={20} color="black" />
-                        <Text style={styles.playButtonText}>Lire</Text>
-                    </TouchableOpacity>
+                        {/* 4. Groupe de Boutons */}
+                        <View className="flex-row mt-4">
 
-                    {/* Bouton SECONDAIRE : Info */}
-                    <TouchableOpacity style={styles.infoButton} onPress={onInfoPress}>
-                        <Ionicons name="information-circle-outline" size={20} color="white" />
-                        <Text style={styles.infoButtonText}>Infos</Text>
-                    </TouchableOpacity>
+                            {/* Bouton Principal: Play Now (Rouge vif) */}
+                            <TouchableOpacity
+                                onPress={onPlayPress}
+                                className="flex-row items-center justify-center bg-red-600 rounded-lg py-3 px-6 shadow-xl mr-3"
+                            >
+                                <Icon name="play" size={18} color="#FFFFFF" className="mr-2" />
+                                <Text className="text-white text-lg font-bold">
+                                    Play Now
+                                </Text>
+                            </TouchableOpacity>
+
+                            {/* Bouton Secondaire: Add to Watchlist (Fond sombre/transparent) */}
+                            <TouchableOpacity
+                                onPress={onInfoPress}
+                                className="flex-row items-center justify-center bg-gray-700/80 rounded-lg py-3 px-5 border border-gray-600"
+                            >
+                                <Icon name="list-outline" size={18} color="#FFFFFF" className="mr-2" />
+                                <Text className="text-white text-lg font-semibold">
+                                    Ma Liste
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </View>
-            </View>
-        </ImageBackground>
+            </ImageBackground>
+        </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        width: '100%',
-        height: 450, // Hauteur fixe pour l'immersion sur mobile
-        justifyContent: 'flex-end',
-    },
-    gradientOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        // Gradient allant du bas vers le haut
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
-        // Simuler un fort gradient en bas pour le texte
-        paddingTop: '50%',
-        paddingBottom: 0,
-    },
-    content: {
-        paddingHorizontal: 15,
-        paddingBottom: 30,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: 'white',
-        marginBottom: 8,
-        textShadowColor: 'rgba(0, 0, 0, 0.75)',
-        textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 3,
-    },
-    infoText: {
-        fontSize: 14,
-        color: '#A0A0A0',
-        marginBottom: 15,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    playButton: {
-        flexDirection: 'row',
-        backgroundColor: 'white',
-        paddingVertical: 8,
-        paddingHorizontal: 20,
-        borderRadius: 4,
-        alignItems: 'center',
-        marginRight: 10,
-    },
-    playButtonText: {
-        color: 'black',
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginLeft: 5,
-    },
-    infoButton: {
-        flexDirection: 'row',
-        backgroundColor: 'rgba(109, 109, 110, 0.7)', // Gris semi-transparent
-        paddingVertical: 8,
-        paddingHorizontal: 20,
-        borderRadius: 4,
-        alignItems: 'center',
-    },
-    infoButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginLeft: 5,
-    },
-});
 
 export default HeroBanner;

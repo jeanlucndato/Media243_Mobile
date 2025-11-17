@@ -1,57 +1,132 @@
+import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
-import { TextInput, TouchableOpacity, View } from 'react-native';
-// Assurez-vous d'utiliser une bibliothèque d'icônes compatible avec NativeWind/Tailwind,
-// comme 'react-native-vector-icons' enveloppé dans un composant stylé si nécessaire,
-// ou une solution comme 'expo-router' pour les icônes.
-// Pour la simplicité ici, nous allons supposer que vous pouvez utiliser des composants stylés.
-
-// Si vous utilisez 'react-native-vector-icons', vous pourriez avoir besoin de l'envelopper :
+import { SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-// Si NativeWind ne fonctionne pas directement sur l'icône, vous devrez utiliser des styles objets,
-// mais nous allons tenter l'approche Tailwind classique en premier.
 
-const StreamSearchBar = ({ onSearch, placeholder = "Rechercher films, séries, acteurs..." }) => {
-    const [searchText, setSearchText] = useState('');
+// Composants (assurez-vous que les chemins sont corrects)
+import Row from '../components/Row'; // Pour afficher les résultats (optionnel ici, pour l'exemple)
+import StreamSearchBar from '../components/StreamSearchBar'; // Barre de recherche personnalisée
 
-    const handleSearch = () => {
-        if (onSearch) {
-            onSearch(searchText);
+// MOCK DATA
+const recentSearches = ['Action', 'Thriller', 'Drame 2024', 'Séries TV', 'Documentaire'];
+const popularCategories = [
+    { name: 'Action', color: 'bg-red-700', icon: 'flash' },
+    { name: 'Comedy', color: 'bg-yellow-500', icon: 'happy' },
+    { name: 'Drame', color: 'bg-blue-700', icon: 'sad' },
+    { name: 'Sci-Fi', color: 'bg-purple-700', icon: 'rocket' },
+    { name: 'Horreur', color: 'bg-black-900', icon: 'skull' },
+    { name: 'Famille', color: 'bg-green-600', icon: 'home' },
+];
+
+const SearchScreen = () => {
+    const navigation = useNavigation();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+
+    const handleSearch = (query) => {
+        setSearchTerm(query);
+        if (query.length > 2) {
+            // Logique pour appeler l'API de recherche ici
+            console.log("Recherche lancée pour:", query);
+            // Exemple de résultat simple
+            setSearchResults([
+                { id: 1, title: 'Résultat 1', poster_url: 'https://via.placeholder.com/150x225/333/fff?text=R1' },
+                { id: 2, title: 'Résultat 2', poster_url: 'https://via.placeholder.com/150x225/444/fff?text=R2' },
+            ]);
+        } else {
+            setSearchResults([]);
         }
     };
 
-    const clearSearch = () => {
-        setSearchText('');
-        if (onSearch) {
-            onSearch(''); // Réinitialiser les résultats de recherche
-        }
+    const handleVoiceSearch = () => {
+        alert("Lancement de la recherche vocale...");
+        // Logique d'activation de la reconnaissance vocale ici
     };
+
+    const renderRecentSearch = (tag) => (
+        <TouchableOpacity
+            key={tag}
+            onPress={() => handleSearch(tag)}
+            className="bg-gray-700 rounded-full px-4 py-2 mr-2 mb-2"
+        >
+            <Text className="text-white text-sm">{tag}</Text>
+        </TouchableOpacity>
+    );
+
+    const renderCategoryVignette = (category) => (
+        <TouchableOpacity
+            key={category.name}
+            onPress={() => handleSearch(`Genre: ${category.name}`)}
+            className={`w-1/2 p-1.5`}
+        >
+            <View className={`rounded-lg h-20 flex-row items-center justify-between p-4 ${category.color}`}>
+                <Text className="text-white text-base font-bold">{category.name}</Text>
+                <Icon name={category.icon} size={28} color="#FFFFFF" />
+            </View>
+        </TouchableOpacity>
+    );
 
     return (
-        <View className="p-4 bg-gray-900 border-b border-gray-700 shadow-md">
-            <View className="flex-row items-center bg-gray-800 rounded-full h-12 px-4">
-                {/* Icône de recherche */}
-                <Icon name="search" size={20} color="#888888" className="mr-3" />
+        <SafeAreaView className="flex-1 bg-black">
+            <StatusBar barStyle="light-content" />
 
-                {/* Champ de texte */}
-                <TextInput
-                    className="flex-1 text-white text-base"
-                    placeholder={placeholder}
-                    placeholderTextColor="#A0AEC0" // Placeholder gris clair
-                    value={searchText}
-                    onChangeText={setSearchText}
-                    onSubmitEditing={handleSearch}
-                    returnKeyType="search"
-                />
+            {/* --- 1. Header (Menu, Logo, Micro) --- */}
+            <View className="flex-row items-center justify-between p-4 border-b border-gray-800">
+                <TouchableOpacity onPress={() => console.log('Ouvrir Menu')}>
+                    <Icon name="menu-outline" size={30} color="#FFFFFF" />
+                </TouchableOpacity>
 
-                {/* Bouton pour effacer le texte (X) */}
-                {searchText.length > 0 && (
-                    <TouchableOpacity onPress={clearSearch} className="ml-3 p-1">
-                        <Icon name="close-circle" size={20} color="#888888" />
-                    </TouchableOpacity>
-                )}
+                <Text className="text-white text-xl font-bold">
+                    Media<Text className="text-red-600">243</Text>
+                </Text>
+
+                <TouchableOpacity onPress={handleVoiceSearch}>
+                    <Icon name="mic" size={26} color="#B82329" /> {/* Micro en couleur d'action */}
+                </TouchableOpacity>
             </View>
-        </View>
+
+            <ScrollView className="flex-1 p-4">
+
+                {/* --- 2. Barre de Recherche Personnalisée --- */}
+                {/* Réutilisez le composant StreamSearchBar que vous avez déjà en Tailwind */}
+                <StreamSearchBar onSearch={handleSearch} placeholder="Rechercher films, séries, acteurs..." />
+
+                {/* --- 3. Affichage des Résultats (si searchTerm est actif) --- */}
+                {searchTerm.length > 0 && searchResults.length > 0 ? (
+                    <View className="mt-6 mb-20">
+                        <Text className="text-white text-lg font-bold mb-3">
+                            Résultats pour "{searchTerm}"
+                        </Text>
+                        <Row mediaList={searchResults} title="" />
+                    </View>
+                ) : (
+                    <>
+                        {/* --- 4. Recherches Récentes (si pas de résultats) --- */}
+                        <View className="mt-6 mb-6">
+                            <Text className="text-white text-lg font-bold mb-3">
+                                Recherches Récentes
+                            </Text>
+                            <View className="flex-row flex-wrap">
+                                {recentSearches.map(renderRecentSearch)}
+                            </View>
+                        </View>
+
+                        {/* --- 5. Catégories Populaires --- */}
+                        <View className="mb-20">
+                            <Text className="text-white text-lg font-bold mb-3">
+                                Parcourir les Catégories
+                            </Text>
+                            <View className="flex-row flex-wrap -m-1.5"> {/* -m-1.5 compense le p-1.5 */}
+                                {popularCategories.map(renderCategoryVignette)}
+                            </View>
+                        </View>
+                    </>
+                )}
+
+            </ScrollView>
+            {/* NOTE: La barre de navigation inférieure sera gérée par votre Tab Navigator */}
+        </SafeAreaView>
     );
 };
 
-export default StreamSearchBar;
+export default SearchScreen;

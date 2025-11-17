@@ -1,10 +1,12 @@
-import { useNavigation } from '@react-navigation/native'; // Pour la navigation
-import { SafeAreaView, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView, ScrollView, StatusBar, View } from 'react-native';
 
+// Importez vos composants
+import AppHeader from '../components/AppHeader'; // NOUVEL IMPORT : Pour l'en-tête
 import HeroBanner from '../components/HeroBanner';
 import Row from '../components/Row';
 
-// MOCK : Données pour le test (assurez-vous que poster_url est valide)
+// MOCK : Données pour le test
 const mockMedia = [
     { id: 1, title: "Héritage 243", poster_url: 'https://via.placeholder.com/150x225/B82329/FFFFFF?text=F1', rating: '9.2' },
     { id: 2, title: "Kin Nights", poster_url: 'https://via.placeholder.com/150x225/404040/FFFFFF?text=F2', rating: '8.5' },
@@ -16,6 +18,7 @@ const mockMedia = [
 const HomePage = () => {
     const navigation = useNavigation();
 
+    // Utilisez les classes Tailwind pour le design de la bannière
     const heroMedia = {
         id: 99,
         title: "Le Cœur de l'Afrique",
@@ -23,16 +26,22 @@ const HomePage = () => {
         // Ajoutez d'autres détails ici
     };
 
-    // Fonction à passer à la HeroBanner
     const navigateToDetail = (id) => {
         navigation.navigate('Detail', { id });
     };
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <StatusBar barStyle="light-content" backgroundColor="#000" />
+        // 🚨 Changement : Remplacement de style={styles.safeArea} par des classes Tailwind
+        <SafeAreaView className="flex-1 bg-black">
+            {/* Définition de la barre de statut (l'arrière-plan noir est géré par la SafeAreaView) */}
+            <StatusBar barStyle="light-content" />
 
-            <ScrollView style={styles.scrollView}>
+            {/* 0. En-tête qui flotte au-dessus du contenu */}
+            {/* L'en-tête est en position absolue ou est le premier élément de la ScrollView */}
+            <AppHeader navigation={navigation} />
+
+            {/* 🚨 Changement : Remplacement de style={styles.scrollView} par des classes Tailwind */}
+            <ScrollView className="flex-1">
 
                 {/* 1. Héro Bannière */}
                 <HeroBanner
@@ -42,33 +51,16 @@ const HomePage = () => {
                 />
 
                 {/* 2. Lignes de Contenu */}
-                <View style={styles.rowContainer}>
+                {/* 🚨 Changement : Remplacement de style={styles.rowContainer} par des classes Tailwind */}
+                <View className="mt-4 pb-20">
                     <Row title="🔥 Tendances Actuelles" mediaList={mockMedia} />
                     <Row title="🎬 Nouveautés" mediaList={mockMedia.slice(2).concat(mockMedia.slice(0))} />
                     <Row title="⭐ Top Évalués" mediaList={mockMedia.slice(1)} />
                 </View>
 
             </ScrollView>
-
-            {/* NOTE : Le Header est omis ici car il est géré par le Tab Navigator,
-               mais vous pourriez le réintégrer en Absolu si nécessaire. */}
-
         </SafeAreaView>
     );
 };
-
-const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#000',
-    },
-    scrollView: {
-        flex: 1,
-    },
-    rowContainer: {
-        marginTop: 15,
-        paddingBottom: 80, // Espace pour la barre de navigation inférieure
-    }
-});
 
 export default HomePage;
