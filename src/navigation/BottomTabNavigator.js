@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomePage from '../screens/HomeScreen';
 // Vous créerez ces écrans (ou les remplacerez par vos vrais noms de fichiers)
 import ProfilePage from '../screens/LoginPage';
-// import SearchPage from '../screens/SearchPage';
+import SearchPage from '../screens/SearchPage';
 
 // Créez le Tab Navigator
 const Tab = createBottomTabNavigator();
