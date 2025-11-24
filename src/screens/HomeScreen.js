@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, ScrollView, StatusBar, View } from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 
-// Importez vos composants
+// Importez vos composants (maintenant tous convertis)
 import AppHeader from '../components/AppHeader';
 import HeroBanner from '../components/HeroBanner';
 import Row from '../components/Row';
@@ -30,20 +30,20 @@ const HomePage = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-black">
+        // Remplacement de la classe Tailwind par style={styles.safeArea}
+        <SafeAreaView style={styles.safeArea}>
             <StatusBar barStyle="light-content" />
 
             {/* 0. En-tête qui flotte au-dessus du contenu */}
-            {/* 🚨 CHANGEMENT MAJEUR : Positionnement Absolu de l'Header */}
-            {/* L'Header doit être ABSOLU pour flotter sur la bannière et rester fixe. */}
-            <View className="absolute top-0 w-full z-20">
-                {/* Z-20 pour s'assurer qu'il est au-dessus de tout */}
+            {/* Remplacement de la classe Tailwind par style={styles.headerAbsolute} */}
+            <View style={styles.headerAbsolute}>
                 <AppHeader navigation={navigation} />
             </View>
 
-            <ScrollView className="flex-1">
+            {/* Remplacement de la classe Tailwind par style={styles.scrollView} */}
+            <ScrollView style={styles.scrollView}>
 
-                {/* 1. Héro Bannière (pas de changement ici, le style est dans HeroBanner.js) */}
+                {/* 1. Héro Bannière */}
                 <HeroBanner
                     media={heroMedia}
                     onPlayPress={() => navigateToDetail(heroMedia.id)}
@@ -51,8 +51,8 @@ const HomePage = () => {
                 />
 
                 {/* 2. Lignes de Contenu */}
-                <View className="mt-4 pb-20">
-                    {/* Le style des titres de ligne (Row) sera géré par Row.js */}
+                {/* Remplacement de la classe Tailwind par style={styles.rowsContainer} */}
+                <View style={styles.rowsContainer}>
                     <Row title="🔥 Tendances Actuelles" mediaList={mockMedia} />
                     <Row title="🎬 Nouveautés" mediaList={mockMedia.slice(2).concat(mockMedia.slice(0))} />
                     <Row title="⭐ Top Évalués" mediaList={mockMedia.slice(1)} />
@@ -63,5 +63,34 @@ const HomePage = () => {
         </SafeAreaView>
     );
 };
+
+// --- Définition des Styles (équivalents CSS) ---
+const styles = StyleSheet.create({
+    // Équivalent de: flex-1 bg-black
+    safeArea: {
+        flex: 1,
+        backgroundColor: 'black',
+    },
+    // Équivalent de: flex-1
+    scrollView: {
+        flex: 1,
+    },
+
+    // 0. En-tête Absolu
+    // Équivalent de: absolute top-0 w-full z-20
+    headerAbsolute: {
+        position: 'absolute', // absolute
+        top: 0,
+        width: '100%', // w-full
+        zIndex: 20, // z-20
+    },
+
+    // 2. Conteneur des Lignes
+    // Équivalent de: mt-4 pb-20
+    rowsContainer: {
+        marginTop: 16, // mt-4
+        paddingBottom: 80, // pb-20
+    }
+});
 
 export default HomePage;
