@@ -9,7 +9,7 @@ const AppHeader = ({ navigation }) => {
         <View style={styles.headerContainer}>
 
             {/* 1. Bouton Menu (à gauche) */}
-            <TouchableOpacity onPress={() => console.log('Ouvrir Menu')}>
+            <TouchableOpacity onPress={() => navigation.openDrawer}>
                 <Icon name="menu-outline" size={32} color="#FFFFFF" />
             </TouchableOpacity>
 
@@ -22,7 +22,7 @@ const AppHeader = ({ navigation }) => {
             </Text>
 
             {/* 3. Bouton Recherche (à droite) */}
-            <TouchableOpacity onPress={() => navigation.navigate('SearchTab')}>
+            <TouchableOpacity onPress={() => navigation.navigate('SearchScreen')}>
                 <Icon name="search-outline" size={26} color="#FFFFFF" />
             </TouchableOpacity>
         </View>

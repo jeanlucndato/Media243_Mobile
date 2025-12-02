@@ -1,13 +1,12 @@
-import { Ionicons } from '@expo/vector-icons'; // Utilisé pour les icônes
+import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-// Importez vos écrans
+// Import screens
 import HomePage from '../screens/HomeScreen';
-// Vous créerez ces écrans (ou les remplacerez par vos vrais noms de fichiers)
-import ProfilePage from '../screens/LoginPage';
+import MyListScreen from '../screens/MyListScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import SearchPage from '../screens/SearchPage';
 
-// Créez le Tab Navigator
 const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => {
@@ -15,18 +14,18 @@ const BottomTabNavigator = () => {
         <Tab.Navigator
             initialRouteName="Accueil"
             screenOptions={{
-                headerShown: false, // Cache le header en haut de page
+                headerShown: false,
                 tabBarStyle: {
-                    backgroundColor: '#000', // Fond noir (Style Netflix)
-                    borderTopColor: '#222', // Petite ligne de séparation sombre
-                    paddingBottom: 5, // Ajout de padding pour les téléphones modernes
-                    height: 55, // Hauteur de la barre
+                    backgroundColor: '#000',
+                    borderTopColor: '#222',
+                    paddingBottom: 5,
+                    height: 60,
                 },
-                tabBarActiveTintColor: '#E50914', // Rouge vif pour l'onglet actif (Netflix Red)
-                tabBarInactiveTintColor: '#808080', // Gris pour les inactifs
+                tabBarActiveTintColor: '#E50914',
+                tabBarInactiveTintColor: '#808080',
             }}
         >
-            {/* 1. Écran d'Accueil */}
+            {/* Home Screen */}
             <Tab.Screen
                 name="Accueil"
                 component={HomePage}
@@ -38,10 +37,10 @@ const BottomTabNavigator = () => {
                 }}
             />
 
-            {/* 2. Écran de Recherche */}
+            {/* Search Screen */}
             <Tab.Screen
                 name="Recherche"
-                component={SearchPage} // Vous devrez créer ce composant
+                component={SearchPage}
                 options={{
                     tabBarLabel: 'Recherche',
                     tabBarIcon: ({ color, size }) => (
@@ -50,12 +49,24 @@ const BottomTabNavigator = () => {
                 }}
             />
 
-            {/* 3. Écran Mon Espace/Profil */}
+            {/* My List Screen */}
             <Tab.Screen
-                name="Mon Espace"
-                component={ProfilePage} // Vous devrez créer ce composant
+                name="MyList"
+                component={MyListScreen}
                 options={{
-                    tabBarLabel: 'Mon Espace',
+                    tabBarLabel: 'Ma Liste',
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="list-outline" color={color} size={size} />
+                    ),
+                }}
+            />
+
+            {/* Profile Screen */}
+            <Tab.Screen
+                name="Profil"
+                component={ProfileScreen}
+                options={{
+                    tabBarLabel: 'Profil',
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="person-outline" color={color} size={size} />
                     ),

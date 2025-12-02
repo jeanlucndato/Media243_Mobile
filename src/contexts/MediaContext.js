@@ -1,33 +1,109 @@
-import { createContext, useContext, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createContext, useContext, useEffect, useState } from 'react';
 
-// Création du Context
 const MediaContext = createContext();
 
-// Hook personnalisé
+const WATCHLIST_KEY = '@media243_watchlist';
+
 export const useMedia = () => {
     return useContext(MediaContext);
 };
 
-// Fournisseur de Contexte (Le "Provider")
 export const MediaProvider = ({ children }) => {
-    // État pour stocker le catalogue complet (mock initial)
     const [mediaCatalogue, setMediaCatalogue] = useState([]);
+    const [watchlist, setWatchlist] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // Fonction pour simuler la récupération des données
+    useEffect(() => {
+        loadWatchlist();
+    }, []);
+
+    const loadWatchlist = async () => {
+        try {
+            const savedWatchlist = await AsyncStorage.getItem(WATCHLIST_KEY);
+            if (savedWatchlist) {
+                setWatchlist(JSON.parse(savedWatchlist));
+            }
+        } catch (error) {
+            console.error('Error loading watchlist:', error);
+        }
+    };
+
+    const saveWatchlist = async (newWatchlist) => {
+        try {
+            await AsyncStorage.setItem(WATCHLIST_KEY, JSON.stringify(newWatchlist));
+        } catch (error) {
+            console.error('Error saving watchlist:', error);
+        }
+    };
+
     const fetchCatalogue = async () => {
         setLoading(true);
-        // En vrai : effectuer l'appel à votre API backend ici
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        console.log("MEDIA MOCK : Catalogue chargé.");
-        setLoading(false);
+        try {
+            // TODO: Replace with actual API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log("MEDIA: Catalogue loaded.");
+        } catch (error) {
+            console.error('Error fetching catalogue:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const addToWatchlist = async (media) => {
+        try {
+            const isAlreadyInList = watchlist.some(item => item.id === media.id);
+
+            if (!isAlreadyInList) {
+                const newWatchlist = [...watchlist, media];
+                setWatchlist(newWatchlist);
+                await saveWatchlist(newWatchlist);
+                return { success: true, message: 'Added to watchlist' };
+            } else {
+                return { success: false, message: 'Already in watchlist' };
+            }
+        } catch (error) {
+            console.error('Error adding to watchlist:', error);
+            return { success: false, error: error.message };
+        }
+    };
+
+    const removeFromWatchlist = async (mediaId) => {
+        try {
+            const newWatchlist = watchlist.filter(item => item.id !== mediaId);
+            setWatchlist(newWatchlist);
+            await saveWatchlist(newWatchlist);
+            return { success: true, message: 'Removed from watchlist' };
+        } catch (error) {
+            console.error('Error removing from watchlist:', error);
+            return { success: false, error: error.message };
+        }
+    };
+
+    const isInWatchlist = (mediaId) => {
+        return watchlist.some(item => item.id === mediaId);
+    };
+
+    const clearWatchlist = async () => {
+        try {
+            setWatchlist([]);
+            await AsyncStorage.removeItem(WATCHLIST_KEY);
+            return { success: true };
+        } catch (error) {
+            console.error('Error clearing watchlist:', error);
+            return { success: false, error: error.message };
+        }
     };
 
     const value = {
         mediaCatalogue,
+        watchlist,
         loading,
         fetchCatalogue,
-        // Plus tard : filtrage, recherche, etc.
+        addToWatchlist,
+        removeFromWatchlist,
+        isInWatchlist,
+        clearWatchlist,
     };
 
     return (

@@ -1,62 +1,75 @@
+import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-// Assurez-vous d'avoir installé react-native-vector-icons
 import Icon from 'react-native-vector-icons/Ionicons';
+import colors from '../constants/colors';
+import { spacing } from '../constants/spacing';
+import { typography } from '../constants/typography';
 
 const HeroBanner = ({ media, onPlayPress, onInfoPress }) => {
-    // Si aucune image n'est fournie, affichez un fond sombre par défaut
     const backgroundSource = media.backgroundImage
         ? { uri: media.backgroundImage }
-        : require('../../assets/images/SNORT.jpg'); // Mettez votre chemin d'image par défaut ici
+        : require('../../assets/images/SNORT.jpg');
+
+    const handlePress = (callback) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        if (callback) callback();
+    };
 
     return (
-        // 1. Conteneur principal avec hauteur définie
-        // Remplacement de la classe Tailwind par style={styles.mainContainer}
         <View style={styles.mainContainer}>
             <ImageBackground
                 source={backgroundSource}
                 resizeMode="cover"
-                // Remplacement de la classe Tailwind par style={styles.imageBackground}
                 style={styles.imageBackground}
             >
-                {/* 2. Dégradé sombre pour améliorer la lisibilité du texte inférieur */}
-                {/* Remplacement de la classe Tailwind par style={styles.overlay} et styles.contentContainer */}
-                <View style={styles.overlay}>
-                    <View style={styles.contentContainer}>
+                {/* Gradient Overlays for better text readability */}
+                <LinearGradient
+                    colors={['rgba(0,0,0,0.8)', 'transparent', 'rgba(0,0,0,0.95)']}
+                    locations={[0, 0.3, 1]}
+                    style={StyleSheet.absoluteFill}
+                />
 
-                        {/* 3. Titre du Contenu */}
-                        {/* Remplacement de la classe Tailwind par style={styles.titleText} */}
-                        <Text style={styles.titleText} numberOfLines={2}>
-                            {media.title || "Titre du Média"}
+                <View style={styles.contentContainer}>
+                    {/* Title */}
+                    <Text style={styles.titleText} numberOfLines={2}>
+                        {media.title || "Titre du Média"}
+                    </Text>
+
+                    {/* Subtitle/Description */}
+                    {media.description && (
+                        <Text style={styles.descriptionText} numberOfLines={2}>
+                            {media.description}
                         </Text>
+                    )}
 
-                        {/* 4. Groupe de Boutons */}
-                        {/* Remplacement de la classe Tailwind par style={styles.buttonGroup} */}
-                        <View style={styles.buttonGroup}>
-
-                            {/* Bouton Principal: Play Now (Rouge vif) */}
-                            {/* Remplacement de la classe Tailwind par style={styles.playButton} */}
-                            <TouchableOpacity
-                                onPress={onPlayPress}
+                    {/* Button Group */}
+                    <View style={styles.buttonGroup}>
+                        {/* Play Now Button with Gradient */}
+                        <TouchableOpacity
+                            onPress={() => handlePress(onPlayPress)}
+                            activeOpacity={0.8}
+                        >
+                            <LinearGradient
+                                colors={[colors.gradientStart, colors.gradientEnd]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
                                 style={styles.playButton}
                             >
-                                <Icon name="play" size={18} color="#FFFFFF" style={styles.iconMargin} />
-                                <Text style={styles.playButtonText}>
-                                    Play Now
-                                </Text>
-                            </TouchableOpacity>
+                                <Icon name="play" size={20} color={colors.textPrimary} style={styles.iconMargin} />
+                                <Text style={styles.playButtonText}>Play Now</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
 
-                            {/* Bouton Secondaire: Add to Watchlist (Fond sombre/transparent) */}
-                            {/* Remplacement de la classe Tailwind par style={styles.infoButton} */}
-                            <TouchableOpacity
-                                onPress={onInfoPress}
-                                style={styles.infoButton}
-                            >
-                                <Icon name="list-outline" size={18} color="#FFFFFF" style={styles.iconMargin} />
-                                <Text style={styles.infoButtonText}>
-                                    Ma Liste
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
+                        {/* Add to List Button */}
+                        <TouchableOpacity
+                            onPress={() => handlePress(onInfoPress)}
+                            style={styles.infoButton}
+                            activeOpacity={0.8}
+                        >
+                            <Icon name="add" size={20} color={colors.textPrimary} style={styles.iconMargin} />
+                            <Text style={styles.infoButtonText}>Ma Liste</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </ImageBackground>
@@ -64,104 +77,78 @@ const HeroBanner = ({ media, onPlayPress, onInfoPress }) => {
     );
 };
 
-// --- Définition des Styles (équivalents CSS) ---
 const styles = StyleSheet.create({
-    // Équivalent de: w-full h-[550px] bg-gray-900
     mainContainer: {
         width: '100%',
-        height: 550,
-        backgroundColor: '#1f2937', // bg-gray-900
+        height: spacing.dimensions.heroBannerHeight,
+        backgroundColor: colors.backgroundElevated,
     },
-
-    // Équivalent de: flex-1 justify-end
     imageBackground: {
         flex: 1,
         justifyContent: 'flex-end',
     },
-
-    // Équivalent de: absolute inset-0 bg-black/30
-    overlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        // bg-black/30 (noir avec opacité 30%)
-        backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    },
-
-    // Équivalent de: flex-1 justify-end p-6
     contentContainer: {
         flex: 1,
         justifyContent: 'flex-end',
-        padding: 24, // p-6 (24 unités)
+        padding: spacing.xl,
+        paddingBottom: spacing['2xl'],
     },
-
-    // Équivalent de: text-white text-4xl font-extrabold mb-2
     titleText: {
-        color: 'white',
-        fontSize: 36,        // text-4xl
-        fontWeight: '900',   // font-extrabold
-        marginBottom: 8,     // mb-2 (8 unités)
+        ...typography.styles.h1,
+        color: colors.textPrimary,
+        marginBottom: spacing.md,
+        textShadowColor: colors.black70,
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 10,
     },
-
-    // Équivalent de: flex-row mt-4
+    descriptionText: {
+        ...typography.styles.body,
+        color: colors.textSecondary,
+        marginBottom: spacing.base,
+        lineHeight: typography.lineHeight.relaxed * typography.fontSize.base,
+    },
     buttonGroup: {
         flexDirection: 'row',
-        marginTop: 16, // mt-4 (16 unités)
+        marginTop: spacing.base,
     },
-
-    // Styles pour les boutons
-    // Équivalent de: flex-row items-center justify-center bg-red-600 rounded-lg py-3 px-6 shadow-xl mr-3
     playButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#DC2626', // bg-red-600
-        borderRadius: 8,            // rounded-lg
-        paddingVertical: 12,        // py-3
-        paddingHorizontal: 24,      // px-6
-        marginRight: 12,            // mr-3
-        // Le style shadow est géré différemment sur iOS/Android, nous utilisons ici un shadowOffset/Radius de base
-        shadowColor: "#000",
+        borderRadius: spacing.borderRadius.base,
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.xl,
+        minWidth: 140,
+        marginRight: spacing.md,
+        shadowColor: colors.background,
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-        elevation: 6, // Pour Android
+        shadowOpacity: 0.4,
+        shadowRadius: 8,
+        elevation: 8,
     },
-
-    // Équivalent de: text-white text-lg font-bold
     playButtonText: {
-        color: 'white',
-        fontSize: 18, // text-lg
-        fontWeight: 'bold',
+        ...typography.styles.button,
+        color: colors.textPrimary,
     },
-
-    // Équivalent de: flex-row items-center justify-center bg-gray-700/80 rounded-lg py-3 px-5 border border-gray-600
     infoButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        // bg-gray-700/80 (gris sombre avec opacité 80%)
-        backgroundColor: 'rgba(55, 65, 81, 0.8)',
-        borderRadius: 8, // rounded-lg
-        paddingVertical: 12, // py-3
-        paddingHorizontal: 20, // px-5 (légèrement moins que px-6)
-        borderWidth: 1, // border
-        borderColor: '#4b5563', // border-gray-600
+        backgroundColor: colors.black70,
+        borderRadius: spacing.borderRadius.base,
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.lg,
+        borderWidth: 1,
+        borderColor: colors.borderLight,
     },
-
-    // Équivalent de: text-white text-lg font-semibold
     infoButtonText: {
-        color: 'white',
-        fontSize: 18, // text-lg
-        fontWeight: '600', // font-semibold
+        ...typography.styles.button,
+        color: colors.textPrimary,
+        fontWeight: typography.fontWeight.semibold,
     },
-
-    // Équivalent de: mr-2 pour les icônes à l'intérieur des boutons
     iconMargin: {
-        marginRight: 8, // mr-2
-    }
+        marginRight: spacing.sm,
+    },
 });
 
 export default HeroBanner;
