@@ -20,32 +20,39 @@ const MyListScreen = () => {
         }
     };
 
-    const renderItem = ({ item }) => (
-        <TouchableOpacity
-            onPress={() => navigation.navigate('Detail', { id: item.id })}
-            style={styles.itemWrapper}
-        >
-            <View style={styles.posterContainer}>
-                <Image
-                    source={{ uri: item.poster_url }}
-                    style={styles.posterImage}
-                    resizeMode="cover"
-                />
-                <View style={styles.titleOverlay}>
-                    <Text style={styles.titleText} numberOfLines={1}>
-                        {item.title}
-                    </Text>
-                </View>
+    const renderItem = ({ item }) => {
+        // Fallback image if poster_url is missing
+        const posterSource = item.poster_url
+            ? { uri: item.poster_url }
+            : { uri: `https://via.placeholder.com/150x225/1a1a1a/DC2626?text=${encodeURIComponent(item.title?.substring(0, 10) || 'Movie')}` };
 
-                <TouchableOpacity
-                    onPress={() => handleRemove(item.id)}
-                    style={styles.deleteButton}
-                >
-                    <Icon name="close" size={14} color={colors.textPrimary} />
-                </TouchableOpacity>
-            </View>
-        </TouchableOpacity>
-    );
+        return (
+            <TouchableOpacity
+                onPress={() => navigation.navigate('Detail', { id: item.itemId || item.id })}
+                style={styles.itemWrapper}
+            >
+                <View style={styles.posterContainer}>
+                    <Image
+                        source={posterSource}
+                        style={styles.posterImage}
+                        resizeMode="cover"
+                    />
+                    <View style={styles.titleOverlay}>
+                        <Text style={styles.titleText} numberOfLines={2}>
+                            {item.title}
+                        </Text>
+                    </View>
+
+                    <TouchableOpacity
+                        onPress={() => handleRemove(item.itemId || item.id)}
+                        style={styles.deleteButton}
+                    >
+                        <Icon name="close" size={16} color={colors.textPrimary} />
+                    </TouchableOpacity>
+                </View>
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -55,6 +62,11 @@ const MyListScreen = () => {
                 <Text style={styles.headerTitle}>
                     Ma <Text style={styles.headerTitleRed}>Liste</Text>
                 </Text>
+                {watchlist.length > 0 && (
+                    <View style={styles.countBadge}>
+                        <Text style={styles.countText}>{watchlist.length}</Text>
+                    </View>
+                )}
             </View>
 
             {watchlist.length === 0 ? (
@@ -68,7 +80,7 @@ const MyListScreen = () => {
             ) : (
                 <FlatList
                     data={watchlist}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => (item.itemId || item.id).toString()}
                     renderItem={renderItem}
                     numColumns={2}
                     columnWrapperStyle={styles.columnWrapper}
@@ -95,9 +107,28 @@ const styles = StyleSheet.create({
     headerTitle: {
         ...typography.styles.h3,
         color: colors.textPrimary,
+        fontWeight: typography.fontWeight.black,
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
     },
     headerTitleRed: {
         color: colors.primary,
+    },
+    countBadge: {
+        backgroundColor: colors.primary,
+        borderRadius: spacing.borderRadius.full,
+        minWidth: 24,
+        height: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: spacing.sm,
+        paddingHorizontal: spacing.xs,
+    },
+    countText: {
+        ...typography.styles.caption,
+        color: colors.textPrimary,
+        fontWeight: typography.fontWeight.bold,
     },
     columnWrapper: {
         justifyContent: 'space-between',
@@ -117,11 +148,12 @@ const styles = StyleSheet.create({
         aspectRatio: 2 / 3,
         borderRadius: spacing.borderRadius.base,
         overflow: 'hidden',
-        shadowColor: colors.background,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 5 },
-        shadowOpacity: 0.34,
+        shadowOpacity: 0.5,
         shadowRadius: 6.27,
         elevation: 10,
+        backgroundColor: colors.backgroundCard,
     },
     posterImage: {
         width: '100%',
@@ -132,12 +164,15 @@ const styles = StyleSheet.create({
         bottom: 0,
         width: '100%',
         padding: spacing.sm,
-        backgroundColor: colors.black50,
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(220, 38, 38, 0.3)',
     },
     titleText: {
-        ...typography.styles.bodySmall,
+        ...typography.styles.caption,
         color: colors.textPrimary,
-        fontWeight: typography.fontWeight.semibold,
+        fontWeight: typography.fontWeight.bold,
+        textAlign: 'center',
     },
     deleteButton: {
         position: 'absolute',
@@ -145,8 +180,13 @@ const styles = StyleSheet.create({
         right: spacing.xs,
         backgroundColor: colors.primary,
         borderRadius: spacing.borderRadius.full,
-        padding: spacing.xs,
+        padding: spacing.sm,
         zIndex: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.5,
+        shadowRadius: 4,
+        elevation: 5,
     },
 });
 

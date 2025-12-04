@@ -36,6 +36,11 @@ const NetflixMediaCard = ({ media, navigation, showTop10, top10Number, size = 'm
 
     const dimensions = cardSizes[size];
 
+    // Fallback image if poster_url is missing or invalid
+    const posterSource = media.poster_url
+        ? { uri: media.poster_url }
+        : { uri: `https://via.placeholder.com/${dimensions.width}x${dimensions.height}/1a1a1a/DC2626?text=${encodeURIComponent(media.title?.substring(0, 10) || 'Movie')}` };
+
     return (
         <TouchableOpacity
             onPressIn={handlePressIn}
@@ -52,23 +57,32 @@ const NetflixMediaCard = ({ media, navigation, showTop10, top10Number, size = 'm
                 {showTop10 && <Top10Badge number={top10Number} />}
 
                 <Image
-                    source={{ uri: media.poster_url }}
+                    source={posterSource}
                     style={styles.cardImage}
                     resizeMode="cover"
                 />
 
+                {/* Enhanced overlay with gradient */}
                 <View style={styles.overlay}>
                     <View style={styles.playButton}>
                         <Icon name="play" size={24} color={colors.textPrimary} />
                     </View>
                 </View>
 
+                {/* Enhanced rating badge */}
                 {media.rating && (
                     <View style={styles.ratingBadge}>
                         <Icon name="star" size={12} color={colors.star} style={styles.starIcon} />
                         <Text style={styles.ratingText}>{media.rating}</Text>
                     </View>
                 )}
+
+                {/* Title overlay at bottom */}
+                <View style={styles.titleOverlay}>
+                    <Text style={styles.titleText} numberOfLines={1}>
+                        {media.title}
+                    </Text>
+                </View>
             </Animated.View>
         </TouchableOpacity>
     );
@@ -130,6 +144,9 @@ const styles = StyleSheet.create({
         ...typography.styles.h4,
         color: colors.textPrimary,
         fontWeight: typography.fontWeight.bold,
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
     },
     seeAllButton: {
         flexDirection: 'row',
@@ -148,11 +165,12 @@ const styles = StyleSheet.create({
         borderRadius: spacing.borderRadius.base,
         overflow: 'hidden',
         marginRight: spacing.sm,
-        shadowColor: colors.background,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.6,
+        shadowOpacity: 0.7,
         shadowRadius: 12,
         elevation: 12,
+        backgroundColor: colors.backgroundCard,
     },
     cardImage: {
         width: '100%',
@@ -160,7 +178,7 @@ const styles = StyleSheet.create({
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'transparent',
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
         justifyContent: 'center',
         alignItems: 'center',
         opacity: 0,
@@ -169,7 +187,7 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 25,
-        backgroundColor: colors.black70,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 2,
@@ -181,10 +199,12 @@ const styles = StyleSheet.create({
         right: spacing.sm,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: colors.black70,
+        backgroundColor: 'rgba(0, 0, 0, 0.85)',
         paddingHorizontal: spacing.sm,
         paddingVertical: spacing.xs,
         borderRadius: spacing.borderRadius.sm,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 215, 0, 0.3)',
     },
     starIcon: {
         marginRight: 2,
@@ -193,6 +213,23 @@ const styles = StyleSheet.create({
         ...typography.styles.caption,
         color: colors.textPrimary,
         fontWeight: typography.fontWeight.bold,
+    },
+    titleOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        paddingHorizontal: spacing.sm,
+        paddingVertical: spacing.xs,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(220, 38, 38, 0.3)',
+    },
+    titleText: {
+        ...typography.styles.caption,
+        color: colors.textPrimary,
+        fontWeight: typography.fontWeight.semibold,
+        textAlign: 'center',
     },
 });
 

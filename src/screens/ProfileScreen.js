@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect, useState } from 'react';
 import { Alert, Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Button from '../components/Button';
@@ -9,11 +10,30 @@ import { spacing } from '../constants/spacing';
 import { typography } from '../constants/typography';
 import { useAuth } from '../contexts/AuthContext';
 import { useMedia } from '../contexts/MediaContext';
+import { api } from '../services/api';
 
 const ProfileScreen = () => {
     const navigation = useNavigation();
     const { user, logout } = useAuth();
     const { watchlist, clearWatchlist } = useMedia();
+    const [profile, setProfile] = useState(null);
+
+    useEffect(() => {
+        if (user) {
+            fetchProfile();
+        }
+    }, [user]);
+
+    const fetchProfile = async () => {
+        try {
+            const response = await api.getProfile(user.id);
+            if (response.status === 'success') {
+                setProfile(response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching profile:", error);
+        }
+    };
 
     const handleLogout = () => {
         Alert.alert(
@@ -76,6 +96,9 @@ const ProfileScreen = () => {
         </TouchableOpacity>
     );
 
+    // Use profile data if available, otherwise fallback to user object or defaults
+    const displayUser = profile || user || {};
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <StatusBar barStyle="light-content" />
@@ -90,16 +113,16 @@ const ProfileScreen = () => {
                 >
                     <View style={styles.profileSection}>
                         <Image
-                            source={{ uri: user?.avatar || 'https://via.placeholder.com/100/DC2626/FFFFFF?text=U' }}
+                            source={{ uri: displayUser.avatar || 'https://via.placeholder.com/100/DC2626/FFFFFF?text=U' }}
                             style={styles.avatar}
                         />
-                        <Text style={styles.userName}>{user?.name || 'Utilisateur'}</Text>
-                        <Text style={styles.userEmail}>{user?.email || 'email@example.com'}</Text>
+                        <Text style={styles.userName}>{displayUser.name || 'Utilisateur'}</Text>
+                        <Text style={styles.userEmail}>{displayUser.email || user?.email || 'email@example.com'}</Text>
 
                         <View style={styles.subscriptionBadge}>
                             <Icon name="star" size={16} color={colors.star} style={styles.starIcon} />
                             <Text style={styles.subscriptionText}>
-                                {user?.subscription === 'premium' ? 'Premium' : 'Free'}
+                                {displayUser.subscription === 'premium' ? 'Premium' : 'Free'}
                             </Text>
                         </View>
                     </View>

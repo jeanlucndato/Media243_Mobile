@@ -16,8 +16,8 @@ const { width } = Dimensions.get('window');
 const NetflixBillboard = ({ media, onPlayPress, onMyListPress }) => {
     const [inMyList, setInMyList] = useState(false);
 
-    const backgroundSource = media.backgroundImage
-        ? { uri: media.backgroundImage }
+    const backgroundSource = media?.backgroundImage || media?.poster_url
+        ? { uri: media.backgroundImage || media.poster_url }
         : require('../../assets/images/SNORT.jpg');
 
     const handleMyListPress = () => {
@@ -38,28 +38,28 @@ const NetflixBillboard = ({ media, onPlayPress, onMyListPress }) => {
                 style={styles.imageBackground}
                 resizeMode="cover"
             >
-                {/* Triple gradient overlay for Netflix look */}
+                {/* Enhanced gradient overlay for better text visibility */}
                 <LinearGradient
-                    colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0.95)']}
-                    locations={[0, 0.4, 1]}
+                    colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.1)', 'rgba(0,0,0,0.95)']}
+                    locations={[0, 0.3, 1]}
                     style={StyleSheet.absoluteFill}
                 />
 
                 <View style={styles.contentContainer}>
-                    {/* Netflix-style logo badge */}
+                    {/* Netflix-style logo badge with shadow */}
                     <View style={styles.logoBadge}>
                         <Text style={styles.logoText}>MEDIA</Text>
                         <Text style={styles.logoAccent}>243</Text>
                     </View>
 
-                    {/* Title */}
+                    {/* Title with text shadow for visibility */}
                     <Text style={styles.title} numberOfLines={2}>
-                        {media.title || "Titre du Média"}
+                        {media?.title || "Titre du Média"}
                     </Text>
 
-                    {/* Metadata row */}
+                    {/* Metadata row with enhanced visibility */}
                     <View style={styles.metadataRow}>
-                        {media.rating && (
+                        {media?.rating && (
                             <View style={styles.matchBadge}>
                                 <Text style={styles.matchText}>{Math.round(media.rating * 10)}% Match</Text>
                             </View>
@@ -71,7 +71,7 @@ const NetflixBillboard = ({ media, onPlayPress, onMyListPress }) => {
                         <Text style={styles.metadataText}>2h 15m</Text>
                     </View>
 
-                    {/* Genres */}
+                    {/* Genres with better styling */}
                     <View style={styles.genreRow}>
                         <Text style={styles.genreText}>Action</Text>
                         <Text style={styles.genreDot}>•</Text>
@@ -80,9 +80,9 @@ const NetflixBillboard = ({ media, onPlayPress, onMyListPress }) => {
                         <Text style={styles.genreText}>Aventure</Text>
                     </View>
 
-                    {/* Action Buttons */}
+                    {/* Enhanced Action Buttons */}
                     <View style={styles.buttonGroup}>
-                        {/* Play Button */}
+                        {/* Play Button with glow effect */}
                         <TouchableOpacity onPress={handlePlayPress} style={styles.playButton}>
                             <Icon name="play" size={24} color={colors.background} style={styles.playIcon} />
                             <Text style={styles.playButtonText}>Lecture</Text>
@@ -135,12 +135,18 @@ const styles = StyleSheet.create({
         color: colors.textPrimary,
         fontWeight: typography.fontWeight.black,
         letterSpacing: 2,
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
     },
     logoAccent: {
         ...typography.styles.h4,
         color: colors.primary,
         fontWeight: typography.fontWeight.black,
         letterSpacing: 2,
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
     },
     title: {
         ...typography.styles.h1,
@@ -148,6 +154,9 @@ const styles = StyleSheet.create({
         color: colors.textPrimary,
         marginBottom: spacing.md,
         fontWeight: typography.fontWeight.black,
+        textShadowColor: 'rgba(0, 0, 0, 0.9)',
+        textShadowOffset: { width: 0, height: 3 },
+        textShadowRadius: 6,
     },
     metadataRow: {
         flexDirection: 'row',
@@ -169,19 +178,23 @@ const styles = StyleSheet.create({
     },
     metadataText: {
         ...typography.styles.bodySmall,
-        color: colors.textSecondary,
+        color: colors.textPrimary,
         marginRight: spacing.md,
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 3,
     },
     maturityBadge: {
         borderWidth: 1,
-        borderColor: colors.textSecondary,
+        borderColor: colors.textPrimary,
         paddingHorizontal: spacing.sm,
         paddingVertical: 1,
         marginRight: spacing.md,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     maturityText: {
         ...typography.styles.caption,
-        color: colors.textSecondary,
+        color: colors.textPrimary,
         fontWeight: typography.fontWeight.semibold,
     },
     genreRow: {
@@ -193,11 +206,15 @@ const styles = StyleSheet.create({
         ...typography.styles.bodySmall,
         color: colors.textPrimary,
         fontWeight: typography.fontWeight.semibold,
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 3,
     },
     genreDot: {
         ...typography.styles.bodySmall,
-        color: colors.textTertiary,
+        color: colors.textPrimary,
         marginHorizontal: spacing.sm,
+        opacity: 0.6,
     },
     buttonGroup: {
         flexDirection: 'row',
@@ -214,6 +231,11 @@ const styles = StyleSheet.create({
         marginRight: spacing.md,
         flex: 1,
         justifyContent: 'center',
+        shadowColor: colors.textPrimary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
     },
     playIcon: {
         marginRight: spacing.sm,
@@ -226,11 +248,13 @@ const styles = StyleSheet.create({
     myListButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: colors.backgroundCard,
+        backgroundColor: 'rgba(42, 42, 42, 0.9)',
         paddingVertical: spacing.md,
         paddingHorizontal: spacing.lg,
         borderRadius: spacing.borderRadius.sm,
         marginRight: spacing.md,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.3)',
     },
     myListButtonText: {
         ...typography.styles.bodySmall,
@@ -240,10 +264,12 @@ const styles = StyleSheet.create({
     infoButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: colors.backgroundCard,
+        backgroundColor: 'rgba(42, 42, 42, 0.9)',
         paddingVertical: spacing.md,
         paddingHorizontal: spacing.lg,
         borderRadius: spacing.borderRadius.sm,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.3)',
     },
     infoButtonText: {
         ...typography.styles.bodySmall,

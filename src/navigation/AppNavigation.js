@@ -33,25 +33,16 @@ const AppNavigator = () => {
                 headerShown: false,
                 contentStyle: { backgroundColor: '#000000' }
             }}
-            // L'écran initial dépend de l'authentification
-            initialRouteName={isAuthenticated ? "AppTabs" : "Login"}
+            // Always show AppTabs (Home) first
+            initialRouteName="AppTabs"
         >
-            {isAuthenticated ? (
-                // Écrans après connexion
-                <>
-                    {/* Le BottomTabNavigator (Accueil, Recherche, Profil) */}
-                    <Stack.Screen name="AppTabs" component={BottomTabNavigator} />
+            {/* Main app screens - always accessible */}
+            <Stack.Screen name="AppTabs" component={BottomTabNavigator} />
+            <Stack.Screen name="Detail" component={DetailPage} />
 
-                    {/* Les pages comme 'Detail' doivent être en dehors des onglets */}
-                    <Stack.Screen name="Detail" component={DetailPage} />
-                </>
-            ) : (
-                // Écrans d'authentification (si déconnecté)
-                <>
-                    <Stack.Screen name="Login" component={LoginPage} />
-                    <Stack.Screen name="Signup" component={SignupPage} />
-                </>
-            )}
+            {/* Auth screens - accessible from Profile when not logged in */}
+            <Stack.Screen name="Login" component={LoginPage} />
+            <Stack.Screen name="Signup" component={SignupPage} />
         </Stack.Navigator>
     );
 };

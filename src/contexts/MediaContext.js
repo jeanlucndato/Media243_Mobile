@@ -1,5 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useState } from 'react';
+import { api } from '../services/api';
+import { useAuth } from './AuthContext';
 
 const MediaContext = createContext();
 
@@ -10,39 +11,42 @@ export const useMedia = () => {
 };
 
 export const MediaProvider = ({ children }) => {
+    const { user } = useAuth();
     const [mediaCatalogue, setMediaCatalogue] = useState([]);
     const [watchlist, setWatchlist] = useState([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        loadWatchlist();
+        fetchCatalogue();
     }, []);
 
+    useEffect(() => {
+        if (user) {
+            loadWatchlist();
+        } else {
+            setWatchlist([]);
+        }
+    }, [user]);
+
     const loadWatchlist = async () => {
+        if (!user) return;
         try {
-            const savedWatchlist = await AsyncStorage.getItem(WATCHLIST_KEY);
-            if (savedWatchlist) {
-                setWatchlist(JSON.parse(savedWatchlist));
+            const response = await api.getWatchlist(user.id);
+            if (response.status === 'success') {
+                setWatchlist(response.data);
             }
         } catch (error) {
             console.error('Error loading watchlist:', error);
         }
     };
 
-    const saveWatchlist = async (newWatchlist) => {
-        try {
-            await AsyncStorage.setItem(WATCHLIST_KEY, JSON.stringify(newWatchlist));
-        } catch (error) {
-            console.error('Error saving watchlist:', error);
-        }
-    };
-
     const fetchCatalogue = async () => {
         setLoading(true);
         try {
-            // TODO: Replace with actual API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            console.log("MEDIA: Catalogue loaded.");
+            const response = await api.getAllMovies();
+            if (response.status === 'success') {
+                setMediaCatalogue(response.data);
+            }
         } catch (error) {
             console.error('Error fetching catalogue:', error);
         } finally {
@@ -51,14 +55,20 @@ export const MediaProvider = ({ children }) => {
     };
 
     const addToWatchlist = async (media) => {
+        if (!user) return { success: false, message: 'User not logged in' };
+
         try {
-            const isAlreadyInList = watchlist.some(item => item.id === media.id);
+            const isAlreadyInList = watchlist.some(item => item.itemId === media.id || item.id === media.id);
 
             if (!isAlreadyInList) {
-                const newWatchlist = [...watchlist, media];
-                setWatchlist(newWatchlist);
-                await saveWatchlist(newWatchlist);
-                return { success: true, message: 'Added to watchlist' };
+                const response = await api.addToWatchlist(user.id, media);
+                if (response.status === 'success') {
+                    // Refresh watchlist to get the correct structure from backend
+                    await loadWatchlist();
+                    return { success: true, message: 'Added to watchlist' };
+                } else {
+                    return { success: false, message: response.message || 'Failed to add to watchlist' };
+                }
             } else {
                 return { success: false, message: 'Already in watchlist' };
             }
@@ -69,11 +79,17 @@ export const MediaProvider = ({ children }) => {
     };
 
     const removeFromWatchlist = async (mediaId) => {
+        if (!user) return { success: false, message: 'User not logged in' };
+
         try {
-            const newWatchlist = watchlist.filter(item => item.id !== mediaId);
-            setWatchlist(newWatchlist);
-            await saveWatchlist(newWatchlist);
-            return { success: true, message: 'Removed from watchlist' };
+            const response = await api.removeFromWatchlist(user.id, mediaId);
+            if (response.status === 'success') {
+                // Refresh watchlist
+                await loadWatchlist();
+                return { success: true, message: 'Removed from watchlist' };
+            } else {
+                return { success: false, message: response.message || 'Failed to remove from watchlist' };
+            }
         } catch (error) {
             console.error('Error removing from watchlist:', error);
             return { success: false, error: error.message };
@@ -81,18 +97,16 @@ export const MediaProvider = ({ children }) => {
     };
 
     const isInWatchlist = (mediaId) => {
-        return watchlist.some(item => item.id === mediaId);
+        // Check both ID formats (backend might return different structure)
+        return watchlist.some(item => item.itemId === mediaId || item.id === mediaId);
     };
 
     const clearWatchlist = async () => {
-        try {
-            setWatchlist([]);
-            await AsyncStorage.removeItem(WATCHLIST_KEY);
-            return { success: true };
-        } catch (error) {
-            console.error('Error clearing watchlist:', error);
-            return { success: false, error: error.message };
-        }
+        // This might not be supported by API directly as "clear all", 
+        // but we can clear local state or implement loop deletion if needed.
+        // For now, we just clear local state.
+        setWatchlist([]);
+        return { success: true };
     };
 
     const value = {

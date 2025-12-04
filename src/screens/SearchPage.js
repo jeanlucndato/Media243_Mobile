@@ -1,32 +1,49 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRef, useState } from 'react';
-import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import NetflixRow from '../components/NetflixRow';
 import colors from '../constants/colors';
 import { spacing } from '../constants/spacing';
 import { typography } from '../constants/typography';
-
-// MOCK DATA
-const mockResults = [
-    { id: 1, title: "Résultat 1", poster_url: 'https://via.placeholder.com/150x225/333/fff?text=R1', rating: 8.5 },
-    { id: 2, title: "Résultat 2", poster_url: 'https://via.placeholder.com/150x225/444/fff?text=R2', rating: 9.0 },
-    { id: 3, title: "Résultat 3", poster_url: 'https://via.placeholder.com/150x225/555/fff?text=R3', rating: 7.8 },
-];
+import { api } from '../services/api';
 
 const categories = ['Action', 'Drame', 'Comédie', 'Thriller', 'Documentaire', 'Famille'];
 
 const SearchScreen = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [loading, setLoading] = useState(false);
     const searchInputRef = useRef(null);
+    const searchTimeout = useRef(null);
 
     const handleSearch = (query) => {
         setSearchTerm(query);
+
+        if (searchTimeout.current) {
+            clearTimeout(searchTimeout.current);
+        }
+
         if (query.length > 2) {
-            setSearchResults(mockResults);
+            setLoading(true);
+            searchTimeout.current = setTimeout(async () => {
+                try {
+                    const response = await api.searchContent(query);
+                    if (response.status === 'success') {
+                        // Combine movies and articles if needed, or just show movies for now
+                        // The API returns { data: { movies: [], articles: [] } }
+                        const movies = response.data.movies || [];
+                        setSearchResults(movies);
+                    }
+                } catch (error) {
+                    console.error("Search error:", error);
+                } finally {
+                    setLoading(false);
+                }
+            }, 500); // Debounce search
         } else {
             setSearchResults([]);
+            setLoading(false);
         }
     };
 
@@ -59,14 +76,21 @@ const SearchScreen = () => {
                             autoCapitalize="none"
                         />
                         {searchTerm.length > 0 && (
-                            <TouchableOpacity onPress={() => setSearchTerm('')}>
+                            <TouchableOpacity onPress={() => {
+                                setSearchTerm('');
+                                setSearchResults([]);
+                            }}>
                                 <Icon name="close-circle" size={20} color={colors.textTertiary} />
                             </TouchableOpacity>
                         )}
                     </View>
                 </View>
 
-                {searchResults.length > 0 ? (
+                {loading ? (
+                    <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="small" color={colors.primary} />
+                    </View>
+                ) : searchResults.length > 0 ? (
                     /* Search Results */
                     <View style={styles.resultsContainer}>
                         <NetflixRow
@@ -74,6 +98,10 @@ const SearchScreen = () => {
                             mediaList={searchResults}
                             size="large"
                         />
+                    </View>
+                ) : searchTerm.length > 2 ? (
+                    <View style={styles.noResultsContainer}>
+                        <Text style={styles.noResultsText}>Aucun résultat trouvé pour "{searchTerm}"</Text>
                     </View>
                 ) : (
                     /* Categories Grid */
@@ -145,6 +173,19 @@ const styles = StyleSheet.create({
     },
     resultsContainer: {
         marginTop: spacing.base,
+    },
+    loadingContainer: {
+        marginTop: spacing.xl,
+        alignItems: 'center',
+    },
+    noResultsContainer: {
+        marginTop: spacing.xl,
+        alignItems: 'center',
+        paddingHorizontal: spacing.base,
+    },
+    noResultsText: {
+        ...typography.styles.body,
+        color: colors.textSecondary,
     },
     categoriesContainer: {
         paddingHorizontal: spacing.base,

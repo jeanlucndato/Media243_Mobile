@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { api } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -38,27 +39,20 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            // TODO: Replace with actual API call
-            // For now, using mock authentication
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const response = await api.login(email, password);
 
-            const mockUser = {
-                id: '1',
-                name: email.split('@')[0],
-                email,
-                subscription: 'premium',
-                avatar: 'https://via.placeholder.com/100/DC2626/FFFFFF?text=' + email[0].toUpperCase(),
-            };
+            if (response.status === 'success') {
+                const { token, user } = response;
 
-            const mockToken = 'mock_token_' + Date.now();
+                await AsyncStorage.setItem(AUTH_TOKEN_KEY, token);
+                await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(user));
 
-            await AsyncStorage.setItem(AUTH_TOKEN_KEY, mockToken);
-            await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(mockUser));
-
-            setUser(mockUser);
-            setIsAuthenticated(true);
-
-            return { success: true };
+                setUser(user);
+                setIsAuthenticated(true);
+                return { success: true };
+            } else {
+                return { success: false, error: response.message || 'Login failed' };
+            }
         } catch (error) {
             console.error('Login error:', error);
             return { success: false, error: error.message };
@@ -67,26 +61,23 @@ export const AuthProvider = ({ children }) => {
 
     const signup = async (name, email, password) => {
         try {
-            // TODO: Replace with actual API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const response = await api.signup(email, password);
 
-            const mockUser = {
-                id: '1',
-                name,
-                email,
-                subscription: 'free',
-                avatar: 'https://via.placeholder.com/100/DC2626/FFFFFF?text=' + name[0].toUpperCase(),
-            };
+            if (response.status === 'success') {
+                const { token, user } = response;
 
-            const mockToken = 'mock_token_' + Date.now();
+                // If the user object from signup doesn't have the name, we might want to add it locally or update profile
+                const userWithDetails = { ...user, name };
 
-            await AsyncStorage.setItem(AUTH_TOKEN_KEY, mockToken);
-            await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(mockUser));
+                await AsyncStorage.setItem(AUTH_TOKEN_KEY, token);
+                await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(userWithDetails));
 
-            setUser(mockUser);
-            setIsAuthenticated(true);
-
-            return { success: true };
+                setUser(userWithDetails);
+                setIsAuthenticated(true);
+                return { success: true };
+            } else {
+                return { success: false, error: response.message || 'Signup failed' };
+            }
         } catch (error) {
             console.error('Signup error:', error);
             return { success: false, error: error.message };

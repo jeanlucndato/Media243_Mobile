@@ -1,39 +1,41 @@
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRef, useState } from 'react';
-import { Animated, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import NetflixBillboard from '../components/NetflixBillboard';
 import NetflixRow from '../components/NetflixRow';
 import colors from '../constants/colors';
 import { spacing } from '../constants/spacing';
 import { typography } from '../constants/typography';
-
-// MOCK DATA
-const mockMedia = [
-    { id: 1, title: "Héritage 243", poster_url: 'https://via.placeholder.com/150x225/B82329/FFFFFF?text=F1', rating: 9.2 },
-    { id: 2, title: "Kin Nights", poster_url: 'https://via.placeholder.com/150x225/404040/FFFFFF?text=F2', rating: 8.5 },
-    { id: 3, title: "La Nuit du Congo", poster_url: 'https://via.placeholder.com/150x225/222222/FFFFFF?text=F3', rating: 8.8 },
-    { id: 4, title: "RDC Stories", poster_url: 'https://via.placeholder.com/150x225/555555/FFFFFF?text=F4', rating: 7.9 },
-    { id: 5, title: "Saga de Goma", poster_url: 'https://via.placeholder.com/150x225/888888/FFFFFF?text=F5', rating: 8.1 },
-    { id: 6, title: "Kinshasa Dreams", poster_url: 'https://via.placeholder.com/150x225/666666/FFFFFF?text=F6', rating: 8.7 },
-    { id: 7, title: "Congo Tales", poster_url: 'https://via.placeholder.com/150x225/333333/FFFFFF?text=F7', rating: 9.0 },
-];
+import { useAuth } from '../contexts/AuthContext';
+import { useMedia } from '../contexts/MediaContext';
 
 const HomePage = () => {
     const navigation = useNavigation();
     const scrollY = useRef(new Animated.Value(0)).current;
     const [headerOpacity] = useState(new Animated.Value(0));
+    const { mediaCatalogue, loading, fetchCatalogue, addToWatchlist } = useMedia();
+    const { user } = useAuth();
 
-    const heroMedia = {
-        id: 99,
-        title: "Le Cœur de l'Afrique",
-        backgroundImage: 'https://via.placeholder.com/1080x600/1C1C1C/FFFFFF?text=Bannière+Principale',
-        rating: 9.5,
-    };
+    useEffect(() => {
+        fetchCatalogue();
+    }, []);
+
+    const heroMedia = mediaCatalogue.length > 0 ? mediaCatalogue[0] : null;
 
     const navigateToDetail = (id) => {
         navigation.navigate('Detail', { id });
+    };
+
+    const handleAddToWatchlist = async (media) => {
+        if (user) {
+            await addToWatchlist(media);
+        } else {
+            // Prompt login or show toast
+            console.log("Please login to add to watchlist");
+            navigation.navigate('Login');
+        }
     };
 
     // Netflix-style transparent header that appears on scroll
@@ -44,6 +46,14 @@ const HomePage = () => {
             extrapolate: 'clamp',
         }),
     };
+
+    if (loading && mediaCatalogue.length === 0) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={colors.primary} />
+            </View>
+        );
+    }
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -61,7 +71,10 @@ const HomePage = () => {
                         </Text>
 
                         <View style={styles.headerIcons}>
-                            <TouchableOpacity style={styles.headerIcon}>
+                            <TouchableOpacity
+                                style={styles.headerIcon}
+                                onPress={() => navigation.navigate('Search')}
+                            >
                                 <Icon name="search-outline" size={24} color={colors.textPrimary} />
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.headerIcon}>
@@ -82,18 +95,20 @@ const HomePage = () => {
                 showsVerticalScrollIndicator={false}
             >
                 {/* Netflix Billboard */}
-                <NetflixBillboard
-                    media={heroMedia}
-                    onPlayPress={() => navigateToDetail(heroMedia.id)}
-                    onMyListPress={() => console.log('Add to list')}
-                />
+                {heroMedia && (
+                    <NetflixBillboard
+                        media={heroMedia}
+                        onPlayPress={() => navigateToDetail(heroMedia.id)}
+                        onMyListPress={() => handleAddToWatchlist(heroMedia)}
+                    />
+                )}
 
                 {/* Content Rows */}
                 <View style={styles.rowsContainer}>
                     {/* Top 10 Row */}
                     <NetflixRow
                         title="🔥 Top 10 en RDC"
-                        mediaList={mockMedia.slice(0, 10)}
+                        mediaList={mediaCatalogue.slice(0, 10)}
                         showTop10={true}
                         size="large"
                     />
@@ -101,7 +116,7 @@ const HomePage = () => {
                     {/* Trending Now */}
                     <NetflixRow
                         title="Tendances actuelles"
-                        mediaList={mockMedia}
+                        mediaList={mediaCatalogue}
                         size="medium"
                         onSeeAll={() => console.log('See all trending')}
                     />
@@ -109,35 +124,35 @@ const HomePage = () => {
                     {/* New Releases */}
                     <NetflixRow
                         title="Nouveautés"
-                        mediaList={[...mockMedia].reverse()}
+                        mediaList={[...mediaCatalogue].reverse()}
                         size="medium"
                     />
 
                     {/* Popular on Media243 */}
                     <NetflixRow
                         title="Populaire sur Media243"
-                        mediaList={mockMedia.slice(2)}
+                        mediaList={mediaCatalogue.slice(2)}
                         size="medium"
                     />
 
                     {/* African Cinema */}
                     <NetflixRow
                         title="Cinéma Africain"
-                        mediaList={mockMedia}
+                        mediaList={mediaCatalogue}
                         size="medium"
                     />
 
                     {/* Series */}
                     <NetflixRow
                         title="Séries à succès"
-                        mediaList={mockMedia.slice(1)}
+                        mediaList={mediaCatalogue.slice(1)}
                         size="medium"
                     />
 
                     {/* Documentaries */}
                     <NetflixRow
                         title="Documentaires"
-                        mediaList={mockMedia.slice(3)}
+                        mediaList={mediaCatalogue.slice(3)}
                         size="small"
                     />
 
@@ -151,6 +166,12 @@ const HomePage = () => {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
+        backgroundColor: colors.background,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
         backgroundColor: colors.background,
     },
     scrollView: {
