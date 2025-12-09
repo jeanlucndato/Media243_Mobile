@@ -39,71 +39,47 @@ const NetflixBillboard = ({ media, onPlayPress, onMyListPress }) => {
                 resizeMode="cover"
             >
                 {/* Enhanced gradient overlay for better text visibility */}
+                {/* Bottom-up gradient for content blending */}
                 <LinearGradient
-                    colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.1)', 'rgba(0,0,0,0.95)']}
-                    locations={[0, 0.3, 1]}
+                    colors={['transparent', 'rgba(0,0,0,0.2)', 'rgba(0,0,0,0.8)', '#000000']}
+                    locations={[0, 0.4, 0.8, 1]}
                     style={StyleSheet.absoluteFill}
                 />
 
                 <View style={styles.contentContainer}>
-                    {/* Netflix-style logo badge with shadow */}
-                    <View style={styles.logoBadge}>
-                        <Text style={styles.logoText}>MEDIA</Text>
-                        <Text style={styles.logoAccent}>243</Text>
-                    </View>
+                    {/* Categories Bar inside Billboard - Optional but common in Netflix */}
 
-                    {/* Title with text shadow for visibility */}
-                    <Text style={styles.title} numberOfLines={2}>
-                        {media?.title || "Titre du Média"}
-                    </Text>
-
-                    {/* Metadata row with enhanced visibility */}
-                    <View style={styles.metadataRow}>
-                        {media?.rating && (
-                            <View style={styles.matchBadge}>
-                                <Text style={styles.matchText}>{Math.round(media.rating * 10)}% Match</Text>
-                            </View>
-                        )}
-                        <Text style={styles.metadataText}>2024</Text>
-                        <View style={styles.maturityBadge}>
-                            <Text style={styles.maturityText}>16+</Text>
+                    {/* Hero Title / Logo Area - Moving title down */}
+                    <View style={styles.heroInfoContainer}>
+                        {/* Genre/Tags Row */}
+                        <View style={styles.genreRow}>
+                            <Text style={styles.genreText}>Suscense</Text>
+                            <Text style={styles.genreDot}>•</Text>
+                            <Text style={styles.genreText}>Excitant</Text>
+                            <Text style={styles.genreDot}>•</Text>
+                            <Text style={styles.genreText}>Drame</Text>
                         </View>
-                        <Text style={styles.metadataText}>2h 15m</Text>
-                    </View>
 
-                    {/* Genres with better styling */}
-                    <View style={styles.genreRow}>
-                        <Text style={styles.genreText}>Action</Text>
-                        <Text style={styles.genreDot}>•</Text>
-                        <Text style={styles.genreText}>Drame</Text>
-                        <Text style={styles.genreDot}>•</Text>
-                        <Text style={styles.genreText}>Aventure</Text>
-                    </View>
+                        {/* Action Buttons Row */}
+                        <View style={styles.buttonGroup}>
+                            {/* My List (Left) */}
+                            <TouchableOpacity onPress={handleMyListPress} style={styles.verticalActionBtn}>
+                                <Icon name={inMyList ? "checkmark" : "add"} size={24} color={colors.textPrimary} />
+                                <Text style={styles.verticalActionText}>Ma liste</Text>
+                            </TouchableOpacity>
 
-                    {/* Enhanced Action Buttons */}
-                    <View style={styles.buttonGroup}>
-                        {/* Play Button with glow effect */}
-                        <TouchableOpacity onPress={handlePlayPress} style={styles.playButton}>
-                            <Icon name="play" size={24} color={colors.background} style={styles.playIcon} />
-                            <Text style={styles.playButtonText}>Lecture</Text>
-                        </TouchableOpacity>
+                            {/* Play Button (Center - White) */}
+                            <TouchableOpacity onPress={handlePlayPress} style={styles.playButton}>
+                                <Icon name="play" size={24} color={colors.black} style={styles.playIcon} />
+                                <Text style={styles.playButtonText}>Lecture</Text>
+                            </TouchableOpacity>
 
-                        {/* My List Button */}
-                        <TouchableOpacity onPress={handleMyListPress} style={styles.myListButton}>
-                            <Icon
-                                name={inMyList ? "checkmark" : "add"}
-                                size={24}
-                                color={colors.textPrimary}
-                                style={styles.iconSpacing}
-                            />
-                            <Text style={styles.myListButtonText}>Ma liste</Text>
-                        </TouchableOpacity>
-
-                        {/* Info Button */}
-                        <TouchableOpacity style={styles.infoButton}>
-                            <Icon name="information-circle-outline" size={24} color={colors.textPrimary} style={styles.iconSpacing} />
-                            <Text style={styles.infoButtonText}>Infos</Text>
-                        </TouchableOpacity>
+                            {/* Info Button (Right) */}
+                            <TouchableOpacity style={styles.verticalActionBtn}>
+                                <Icon name="information-circle-outline" size={24} color={colors.textPrimary} />
+                                <Text style={styles.verticalActionText}>Infos</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </ImageBackground>
@@ -114,170 +90,78 @@ const NetflixBillboard = ({ media, onPlayPress, onMyListPress }) => {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        height: 600,
+        height: 550, // Significant height for Hero
         backgroundColor: colors.background,
+        marginBottom: spacing.lg,
     },
     imageBackground: {
         flex: 1,
         justifyContent: 'flex-end',
     },
     contentContainer: {
-        padding: spacing.base,
-        paddingBottom: spacing.xl,
+        paddingBottom: spacing.lg,
+        paddingHorizontal: spacing.lg,
+        justifyContent: 'flex-end',
     },
-    logoBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: spacing.md,
-    },
-    logoText: {
-        ...typography.styles.h4,
-        color: colors.textPrimary,
-        fontWeight: typography.fontWeight.black,
-        letterSpacing: 2,
-        textShadowColor: 'rgba(0, 0, 0, 0.8)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 4,
-    },
-    logoAccent: {
-        ...typography.styles.h4,
-        color: colors.primary,
-        fontWeight: typography.fontWeight.black,
-        letterSpacing: 2,
-        textShadowColor: 'rgba(0, 0, 0, 0.8)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 4,
-    },
-    title: {
-        ...typography.styles.h1,
-        fontSize: 36,
-        color: colors.textPrimary,
-        marginBottom: spacing.md,
-        fontWeight: typography.fontWeight.black,
-        textShadowColor: 'rgba(0, 0, 0, 0.9)',
-        textShadowOffset: { width: 0, height: 3 },
-        textShadowRadius: 6,
-    },
-    metadataRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: spacing.sm,
-        flexWrap: 'wrap',
-    },
-    matchBadge: {
-        backgroundColor: colors.success,
-        paddingHorizontal: spacing.sm,
-        paddingVertical: 2,
-        borderRadius: 2,
-        marginRight: spacing.md,
-    },
-    matchText: {
-        ...typography.styles.caption,
-        color: colors.textPrimary,
-        fontWeight: typography.fontWeight.bold,
-    },
-    metadataText: {
-        ...typography.styles.bodySmall,
-        color: colors.textPrimary,
-        marginRight: spacing.md,
-        textShadowColor: 'rgba(0, 0, 0, 0.8)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 3,
-    },
-    maturityBadge: {
-        borderWidth: 1,
-        borderColor: colors.textPrimary,
-        paddingHorizontal: spacing.sm,
-        paddingVertical: 1,
-        marginRight: spacing.md,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    maturityText: {
-        ...typography.styles.caption,
-        color: colors.textPrimary,
-        fontWeight: typography.fontWeight.semibold,
+    heroInfoContainer: {
+        alignItems: 'center', // Center align everything like Netflix mobile
     },
     genreRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: spacing.lg,
+        marginBottom: spacing.md,
+        justifyContent: 'center',
     },
     genreText: {
         ...typography.styles.bodySmall,
         color: colors.textPrimary,
-        fontWeight: typography.fontWeight.semibold,
-        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        fontWeight: typography.fontWeight.medium,
+        textShadowColor: 'rgba(0,0,0,0.75)',
         textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 3,
+        textShadowRadius: 2,
     },
     genreDot: {
-        ...typography.styles.bodySmall,
-        color: colors.textPrimary,
+        color: colors.primary, // Red dots
         marginHorizontal: spacing.sm,
-        opacity: 0.6,
+        fontSize: 20, // Bigger dot
+        lineHeight: 20,
     },
     buttonGroup: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: spacing.md,
+        justifyContent: 'space-between', // Distribute buttons
+        width: '100%',
+        paddingHorizontal: spacing.sm,
+    },
+    verticalActionBtn: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 60,
+    },
+    verticalActionText: {
+        ...typography.styles.caption,
+        color: colors.textSecondary, // Muted text color
+        marginTop: 4,
+        fontWeight: '500',
     },
     playButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: colors.textPrimary,
-        paddingVertical: spacing.md,
-        paddingHorizontal: spacing.xl,
-        borderRadius: spacing.borderRadius.sm,
-        marginRight: spacing.md,
-        flex: 1,
+        backgroundColor: colors.white, // White Play Button
+        paddingVertical: 8,
+        paddingHorizontal: 20,
+        borderRadius: 4, // Netflix uses slight rounded corners, not pill
+        minWidth: 110,
         justifyContent: 'center',
-        shadowColor: colors.textPrimary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
     },
     playIcon: {
-        marginRight: spacing.sm,
+        marginRight: 4,
     },
     playButtonText: {
         ...typography.styles.button,
-        color: colors.background,
-        fontWeight: typography.fontWeight.bold,
-    },
-    myListButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: 'rgba(42, 42, 42, 0.9)',
-        paddingVertical: spacing.md,
-        paddingHorizontal: spacing.lg,
-        borderRadius: spacing.borderRadius.sm,
-        marginRight: spacing.md,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.3)',
-    },
-    myListButtonText: {
-        ...typography.styles.bodySmall,
-        color: colors.textPrimary,
-        fontWeight: typography.fontWeight.semibold,
-    },
-    infoButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: 'rgba(42, 42, 42, 0.9)',
-        paddingVertical: spacing.md,
-        paddingHorizontal: spacing.lg,
-        borderRadius: spacing.borderRadius.sm,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.3)',
-    },
-    infoButtonText: {
-        ...typography.styles.bodySmall,
-        color: colors.textPrimary,
-        fontWeight: typography.fontWeight.semibold,
-    },
-    iconSpacing: {
-        marginRight: spacing.xs,
+        color: colors.black, // Black text on White button
+        fontWeight: 'bold',
+        fontSize: 18,
     },
 });
 

@@ -1,8 +1,6 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRef, useState } from 'react';
-import { ActivityIndicator, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import NetflixRow from '../components/NetflixRow';
 import colors from '../constants/colors';
 import { spacing } from '../constants/spacing';
 import { typography } from '../constants/typography';
@@ -52,75 +50,85 @@ const SearchScreen = () => {
             <StatusBar barStyle="light-content" />
 
             {/* Netflix-style header */}
-            <LinearGradient
-                colors={['rgba(0,0,0,0.9)', 'rgba(0,0,0,0.7)', 'transparent']}
-                style={styles.header}
-            >
-                <View style={styles.headerContent}>
-                    <Text style={styles.headerTitle}>Recherche</Text>
+            <View style={styles.header}>
+                <View style={styles.searchBar}>
+                    <Icon name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
+                    <TextInput
+                        ref={searchInputRef}
+                        style={styles.searchInput}
+                        placeholder="Search games, show, movies..."
+                        placeholderTextColor={colors.textSecondary}
+                        value={searchTerm}
+                        onChangeText={handleSearch}
+                        autoCapitalize="none"
+                        selectionColor={colors.primary}
+                    />
+                    {searchTerm.length > 0 ? (
+                        <TouchableOpacity onPress={() => {
+                            setSearchTerm('');
+                            setSearchResults([]);
+                        }}>
+                            <Icon name="close-circle" size={20} color={colors.textSecondary} />
+                        </TouchableOpacity>
+                    ) : (
+                        <Icon name="mic-outline" size={20} color={colors.textSecondary} />
+                    )}
                 </View>
-            </LinearGradient>
+            </View>
 
             <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-                {/* Search Bar */}
-                <View style={styles.searchContainer}>
-                    <View style={styles.searchBar}>
-                        <Icon name="search-outline" size={20} color={colors.textTertiary} style={styles.searchIcon} />
-                        <TextInput
-                            ref={searchInputRef}
-                            style={styles.searchInput}
-                            placeholder="Titres, personnes, genres"
-                            placeholderTextColor={colors.textTertiary}
-                            value={searchTerm}
-                            onChangeText={handleSearch}
-                            autoCapitalize="none"
-                        />
-                        {searchTerm.length > 0 && (
-                            <TouchableOpacity onPress={() => {
-                                setSearchTerm('');
-                                setSearchResults([]);
-                            }}>
-                                <Icon name="close-circle" size={20} color={colors.textTertiary} />
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                </View>
-
                 {loading ? (
                     <View style={styles.loadingContainer}>
-                        <ActivityIndicator size="small" color={colors.primary} />
+                        <ActivityIndicator size="large" color={colors.primary} />
                     </View>
                 ) : searchResults.length > 0 ? (
-                    /* Search Results */
+                    /* Search Results - Grid or List? Netflix uses Grid for browse, List for Top Search 
+                       BUT when typing, it shows "Top Results" or "Movies & TV".
+                       Let's stick to Grid for results as it's more visual.
+                    */
                     <View style={styles.resultsContainer}>
-                        <NetflixRow
-                            title="Résultats de recherche"
-                            mediaList={searchResults}
-                            size="large"
-                        />
-                    </View>
-                ) : searchTerm.length > 2 ? (
-                    <View style={styles.noResultsContainer}>
-                        <Text style={styles.noResultsText}>Aucun résultat trouvé pour "{searchTerm}"</Text>
-                    </View>
-                ) : (
-                    /* Categories Grid */
-                    <View style={styles.categoriesContainer}>
-                        <Text style={styles.sectionTitle}>Parcourir par catégorie</Text>
-                        <View style={styles.categoriesGrid}>
-                            {categories.map((category, index) => (
-                                <TouchableOpacity key={index} style={styles.categoryCard}>
-                                    <LinearGradient
-                                        colors={[colors.primaryDark, colors.background]}
-                                        start={{ x: 0, y: 0 }}
-                                        end={{ x: 1, y: 1 }}
-                                        style={styles.categoryGradient}
-                                    >
-                                        <Text style={styles.categoryText}>{category}</Text>
-                                    </LinearGradient>
+                        <Text style={styles.sectionTitle}>Movies & TV</Text>
+                        {/* Reusing the Grid Layout from DetailPage roughly */}
+                        <View style={styles.gridContainer}>
+                            {searchResults.map((item) => (
+                                <TouchableOpacity
+                                    key={item.id}
+                                    style={styles.gridItem}
+                                    onPress={() => navigation.push('Detail', { id: item.id })} // Assuming Detail stack
+                                >
+                                    <View style={styles.rowItemContent}>
+                                        {/* Horizontal List View for Search Results is also common but Grid is better for Volume */}
+                                        <Image
+                                            source={{ uri: item.poster_url || 'https://via.placeholder.com/150' }}
+                                            style={styles.gridImage}
+                                            resizeMode="cover"
+                                        />
+                                    </View>
                                 </TouchableOpacity>
                             ))}
                         </View>
+                    </View>
+                ) : searchTerm.length > 2 ? (
+                    <View style={styles.noResultsContainer}>
+                        <Text style={styles.noResultsText}>Oh darn. We don't have that.</Text>
+                        <Text style={styles.noResultsSubText}>Try searching for something else.</Text>
+                    </View>
+                ) : (
+                    /* Default View: Top Searches (List View) */
+                    <View style={styles.topSearchesContainer}>
+                        <Text style={styles.sectionTitle}>Top Searches</Text>
+                        {/* Mock Top Searches using categories or catalogue (if available) */}
+                        {/* For now, using categories as a placeholder for "Top Search" items visually */}
+                        {categories.map((category, index) => (
+                            <TouchableOpacity key={index} style={styles.topSearchItem}>
+                                <Image
+                                    source={{ uri: `https://via.placeholder.com/150x85/202020/FFFFFF?text=${category}` }}
+                                    style={styles.topSearchImage}
+                                />
+                                <Text style={styles.topSearchText}>{category}</Text>
+                                <Icon name="play-circle-outline" size={28} color={colors.white} style={styles.playIcon} />
+                            </TouchableOpacity>
+                        ))}
                     </View>
                 )}
 
@@ -139,89 +147,104 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
-        paddingTop: spacing['2xl'],
-        paddingBottom: spacing.base,
-    },
-    headerContent: {
-        paddingHorizontal: spacing.base,
-    },
-    headerTitle: {
-        ...typography.styles.h3,
-        color: colors.textPrimary,
-        fontWeight: typography.fontWeight.black,
-    },
-    searchContainer: {
-        paddingHorizontal: spacing.base,
-        paddingVertical: spacing.base,
+        backgroundColor: colors.background, // Solid black header
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 50,
+        paddingBottom: spacing.sm,
+        paddingHorizontal: spacing.sm,
+        zIndex: 100,
     },
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: colors.backgroundCard,
-        borderRadius: spacing.borderRadius.sm,
-        paddingHorizontal: spacing.base,
-        paddingVertical: spacing.xs,
+        backgroundColor: '#262626', // Darker grey like Netflix search bar
+        height: 50, // Standard height
+        borderRadius: 4, // Netflix search bar is mostly square
+        paddingHorizontal: spacing.sm,
     },
     searchIcon: {
-        marginRight: spacing.md,
+        marginRight: spacing.sm,
     },
     searchInput: {
         flex: 1,
         ...typography.styles.body,
         color: colors.textPrimary,
-        paddingVertical: spacing.sm,
-    },
-    resultsContainer: {
-        marginTop: spacing.base,
+        height: '100%',
     },
     loadingContainer: {
         marginTop: spacing.xl,
         alignItems: 'center',
     },
-    noResultsContainer: {
-        marginTop: spacing.xl,
-        alignItems: 'center',
-        paddingHorizontal: spacing.base,
-    },
-    noResultsText: {
-        ...typography.styles.body,
-        color: colors.textSecondary,
-    },
-    categoriesContainer: {
-        paddingHorizontal: spacing.base,
-        marginTop: spacing.base,
+    resultsContainer: {
+        padding: spacing.sm,
     },
     sectionTitle: {
         ...typography.styles.h4,
         color: colors.textPrimary,
-        fontWeight: typography.fontWeight.bold,
-        marginBottom: spacing.lg,
+        fontWeight: 'bold',
+        marginBottom: spacing.md,
+        marginTop: spacing.sm,
+        marginLeft: spacing.sm,
     },
-    categoriesGrid: {
+    gridContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: spacing.md,
+        justifyContent: 'flex-start',
+        gap: 8,
     },
-    categoryCard: {
-        width: '47%',
-        height: 80,
-        borderRadius: spacing.borderRadius.base,
+    gridItem: {
+        width: '31%', // 3 columns
+        aspectRatio: 2 / 3,
+        marginBottom: 8,
+        borderRadius: 4,
         overflow: 'hidden',
+        backgroundColor: colors.backgroundCard,
     },
-    categoryGradient: {
-        flex: 1,
-        justifyContent: 'center',
+    gridImage: {
+        width: '100%',
+        height: '100%',
+    },
+    noResultsContainer: {
+        marginTop: spacing['3xl'],
         alignItems: 'center',
-        padding: spacing.base,
+        paddingHorizontal: spacing.xl,
     },
-    categoryText: {
-        ...typography.styles.bodyLarge,
+    noResultsText: {
+        ...typography.styles.h3,
         color: colors.textPrimary,
-        fontWeight: typography.fontWeight.bold,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: spacing.sm,
+    },
+    noResultsSubText: {
+        ...typography.styles.body,
+        color: colors.textSecondary,
         textAlign: 'center',
     },
+    topSearchesContainer: {
+        marginTop: spacing.sm,
+    },
+    topSearchItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 2, // Tiny gap
+        backgroundColor: '#121212',
+    },
+    topSearchImage: {
+        width: 130, // Landscape
+        height: 70,
+        marginRight: spacing.md,
+    },
+    topSearchText: {
+        ...typography.styles.bodyLarge,
+        color: colors.textPrimary,
+        fontWeight: 'bold',
+        flex: 1,
+    },
+    playIcon: {
+        marginRight: spacing.md,
+    },
     bottomSpacer: {
-        height: spacing['6xl'],
+        height: 80,
     },
 });
 

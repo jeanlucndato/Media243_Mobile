@@ -77,7 +77,6 @@ const SignupPage = () => {
                     <View style={styles.formContainer}>
                         {/* Name Input */}
                         <View style={styles.inputContainer}>
-                            <Icon name="person-outline" size={20} color={colors.textTertiary} style={styles.inputIcon} />
                             <TextInput
                                 style={styles.input}
                                 placeholder="Nom complet"
@@ -85,12 +84,12 @@ const SignupPage = () => {
                                 autoCapitalize="words"
                                 value={name}
                                 onChangeText={setName}
+                                selectionColor={colors.primary}
                             />
                         </View>
 
                         {/* Email Input */}
                         <View style={styles.inputContainer}>
-                            <Icon name="mail-outline" size={20} color={colors.textTertiary} style={styles.inputIcon} />
                             <TextInput
                                 style={styles.input}
                                 placeholder="Email"
@@ -99,12 +98,12 @@ const SignupPage = () => {
                                 autoCapitalize="none"
                                 value={email}
                                 onChangeText={setEmail}
+                                selectionColor={colors.primary}
                             />
                         </View>
 
                         {/* Password Input */}
                         <View style={styles.inputContainer}>
-                            <Icon name="lock-closed-outline" size={20} color={colors.textTertiary} style={styles.inputIcon} />
                             <TextInput
                                 style={styles.input}
                                 placeholder="Mot de passe"
@@ -112,8 +111,9 @@ const SignupPage = () => {
                                 secureTextEntry={!showPassword}
                                 value={password}
                                 onChangeText={setPassword}
+                                selectionColor={colors.primary}
                             />
-                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
                                 <Icon
                                     name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                                     size={20}
@@ -133,7 +133,6 @@ const SignupPage = () => {
 
                         {/* Confirm Password Input */}
                         <View style={styles.inputContainer}>
-                            <Icon name="lock-closed-outline" size={20} color={colors.textTertiary} style={styles.inputIcon} />
                             <TextInput
                                 style={styles.input}
                                 placeholder="Confirmer le mot de passe"
@@ -141,6 +140,7 @@ const SignupPage = () => {
                                 secureTextEntry={!showPassword}
                                 value={confirmPassword}
                                 onChangeText={setConfirmPassword}
+                                selectionColor={colors.primary}
                             />
                         </View>
 
@@ -207,15 +207,16 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: colors.backgroundCard,
-        borderRadius: spacing.borderRadius.base,
+        backgroundColor: '#333333', // Netflix dark grey input
+        borderRadius: 4,
         paddingHorizontal: spacing.base,
         marginBottom: spacing.base,
-        borderWidth: 1,
-        borderColor: colors.border,
+        borderWidth: 0,
+        minHeight: 50,
     },
-    inputIcon: {
-        marginRight: spacing.md,
+    // inputIcon removed
+    eyeIcon: {
+        padding: spacing.xs,
     },
     input: {
         flex: 1,

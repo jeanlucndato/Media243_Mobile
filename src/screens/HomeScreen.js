@@ -62,23 +62,36 @@ const HomePage = () => {
             {/* Netflix-style transparent header */}
             <Animated.View style={[styles.headerAbsolute, headerAnimatedStyle]}>
                 <LinearGradient
-                    colors={['rgba(0,0,0,0.9)', 'rgba(0,0,0,0.7)', 'transparent']}
+                    colors={[colors.gradientBlackEnd, colors.gradientBlackStart]} // Using new color constants
                     style={styles.headerGradient}
                 >
                     <View style={styles.headerContent}>
+                        {/* Logo - In real app, use Image. For now, styled text */}
                         <Text style={styles.headerLogo}>
-                            MEDIA<Text style={styles.headerLogoAccent}>243</Text>
+                            M<Text style={styles.headerLogoAccent}>EDIA</Text>
                         </Text>
 
                         <View style={styles.headerIcons}>
+                            {/* Cast Icon Placeholder */}
+                            <TouchableOpacity style={styles.headerIcon}>
+                                <Icon name="tv-outline" size={24} color={colors.textPrimary} />
+                            </TouchableOpacity>
+
                             <TouchableOpacity
                                 style={styles.headerIcon}
                                 onPress={() => navigation.navigate('Search')}
                             >
-                                <Icon name="search-outline" size={24} color={colors.textPrimary} />
+                                <Icon name="search" size={24} color={colors.textPrimary} />
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.headerIcon}>
-                                <Icon name="notifications-outline" size={24} color={colors.textPrimary} />
+
+                            <TouchableOpacity
+                                style={styles.headerIcon}
+                                onPress={() => navigation.navigate('Menu')} // Navigate to Menu/Profile
+                            >
+                                {/* Avatar Placeholder */}
+                                <View style={styles.avatarPlaceholder}>
+                                    <Icon name="person" size={16} color={colors.white} />
+                                </View>
                             </TouchableOpacity>
                         </View>
                     </View>

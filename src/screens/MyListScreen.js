@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
-import { FlatList, Image, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import EmptyState from '../components/EmptyState';
 import colors from '../constants/colors';
@@ -37,17 +37,13 @@ const MyListScreen = () => {
                         style={styles.posterImage}
                         resizeMode="cover"
                     />
-                    <View style={styles.titleOverlay}>
-                        <Text style={styles.titleText} numberOfLines={2}>
-                            {item.title}
-                        </Text>
-                    </View>
 
                     <TouchableOpacity
                         onPress={() => handleRemove(item.itemId || item.id)}
                         style={styles.deleteButton}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
-                        <Icon name="close" size={16} color={colors.textPrimary} />
+                        <Icon name="close" size={14} color={colors.white} />
                     </TouchableOpacity>
                 </View>
             </TouchableOpacity>
@@ -59,9 +55,7 @@ const MyListScreen = () => {
             <StatusBar barStyle="light-content" />
 
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>
-                    Ma <Text style={styles.headerTitleRed}>Liste</Text>
-                </Text>
+                <Text style={styles.headerTitle}>My List</Text>
                 {watchlist.length > 0 && (
                     <View style={styles.countBadge}>
                         <Text style={styles.countText}>{watchlist.length}</Text>
@@ -71,20 +65,21 @@ const MyListScreen = () => {
 
             {watchlist.length === 0 ? (
                 <EmptyState
-                    icon="list-outline"
-                    title="Votre Liste est vide"
-                    message="Ajoutez des films et séries pour les retrouver facilement ici!"
-                    actionLabel="Explorer le Contenu"
-                    onAction={() => navigation.navigate('Accueil')}
+                    icon="add-circle-outline"
+                    title="Empy List"
+                    message="Add movies and shows to your list so you can easily find them later."
+                    actionLabel="Find Something to Watch"
+                    onAction={() => navigation.navigate('Home')}
                 />
             ) : (
                 <FlatList
                     data={watchlist}
                     keyExtractor={(item) => (item.itemId || item.id).toString()}
                     renderItem={renderItem}
-                    numColumns={2}
+                    numColumns={3}
                     columnWrapperStyle={styles.columnWrapper}
                     contentContainerStyle={styles.listContent}
+                    showsVerticalScrollIndicator={false}
                 />
             )}
         </SafeAreaView>
@@ -99,94 +94,62 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: spacing.base,
-        borderBottomWidth: 1,
-        borderColor: colors.border,
+        paddingHorizontal: spacing.base,
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 50,
+        paddingBottom: spacing.base,
+        // Netflix often has a sticky header or just a simple text
     },
     headerTitle: {
         ...typography.styles.h3,
         color: colors.textPrimary,
-        fontWeight: typography.fontWeight.black,
-        textShadowColor: 'rgba(0, 0, 0, 0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 2,
-    },
-    headerTitleRed: {
-        color: colors.primary,
+        fontWeight: 'bold',
+        marginRight: spacing.sm,
     },
     countBadge: {
-        backgroundColor: colors.primary,
-        borderRadius: spacing.borderRadius.full,
-        minWidth: 24,
-        height: 24,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginLeft: spacing.sm,
-        paddingHorizontal: spacing.xs,
+        // Optional: Netflix doesn't always show count in header
+        backgroundColor: '#262626',
+        borderRadius: 12,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
     },
     countText: {
         ...typography.styles.caption,
-        color: colors.textPrimary,
-        fontWeight: typography.fontWeight.bold,
+        color: colors.textSecondary,
     },
     columnWrapper: {
-        justifyContent: 'space-between',
-        paddingHorizontal: spacing.sm,
+        gap: 8,
+        paddingHorizontal: 8,
     },
     listContent: {
-        paddingVertical: spacing.md,
+        paddingTop: spacing.xs,
         paddingBottom: spacing['6xl'],
     },
     itemWrapper: {
-        width: '48%',
-        marginBottom: spacing.base,
+        flex: 1,
+        maxWidth: '33.33%', // 3 columns
+        marginBottom: 8,
     },
     posterContainer: {
         position: 'relative',
         width: '100%',
         aspectRatio: 2 / 3,
-        borderRadius: spacing.borderRadius.base,
+        borderRadius: 4,
         overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 5 },
-        shadowOpacity: 0.5,
-        shadowRadius: 6.27,
-        elevation: 10,
         backgroundColor: colors.backgroundCard,
     },
     posterImage: {
         width: '100%',
         height: '100%',
     },
-    titleOverlay: {
-        position: 'absolute',
-        bottom: 0,
-        width: '100%',
-        padding: spacing.sm,
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(220, 38, 38, 0.3)',
-    },
-    titleText: {
-        ...typography.styles.caption,
-        color: colors.textPrimary,
-        fontWeight: typography.fontWeight.bold,
-        textAlign: 'center',
-    },
+    // Removed titleOverlay for cleaner look
     deleteButton: {
         position: 'absolute',
-        top: spacing.xs,
-        right: spacing.xs,
-        backgroundColor: colors.primary,
-        borderRadius: spacing.borderRadius.full,
-        padding: spacing.sm,
+        top: 4,
+        right: 4,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        borderRadius: 12,
+        padding: 4,
         zIndex: 1,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.5,
-        shadowRadius: 4,
-        elevation: 5,
     },
 });
 

@@ -1,236 +1,116 @@
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useEffect, useState } from 'react';
-import { Alert, Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import Button from '../components/Button';
 import colors from '../constants/colors';
 import { spacing } from '../constants/spacing';
 import { typography } from '../constants/typography';
 import { useAuth } from '../contexts/AuthContext';
 import { useMedia } from '../contexts/MediaContext';
-import { api } from '../services/api';
+
+import NetflixRow from '../components/NetflixRow'; // Reuse for horizontal lists
 
 const ProfileScreen = () => {
     const navigation = useNavigation();
     const { user, logout } = useAuth();
-    const { watchlist, clearWatchlist } = useMedia();
-    const [profile, setProfile] = useState(null);
+    const { watchlist } = useMedia();
 
-    useEffect(() => {
-        if (user) {
-            fetchProfile();
-        }
-    }, [user]);
+    // Mock data for "liked" or history if not available
+    const notifications = [];
 
-    const fetchProfile = async () => {
-        try {
-            const response = await api.getProfile(user.id);
-            if (response.status === 'success') {
-                setProfile(response.data);
-            }
-        } catch (error) {
-            console.error("Error fetching profile:", error);
-        }
+    const handleLogout = async () => {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        logout();
     };
 
-    const handleLogout = () => {
-        Alert.alert(
-            'Se Déconnecter',
-            'Êtes-vous sûr de vouloir vous déconnecter?',
-            [
-                { text: 'Annuler', style: 'cancel' },
-                {
-                    text: 'Déconnexion',
-                    style: 'destructive',
-                    onPress: async () => {
-                        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                        await logout();
-                    },
-                },
-            ]
-        );
-    };
-
-    const handleClearWatchlist = () => {
-        Alert.alert(
-            'Vider Ma Liste',
-            'Voulez-vous vraiment supprimer tous les éléments de votre liste?',
-            [
-                { text: 'Annuler', style: 'cancel' },
-                {
-                    text: 'Vider',
-                    style: 'destructive',
-                    onPress: async () => {
-                        const result = await clearWatchlist();
-                        if (result.success) {
-                            Alert.alert('Succès', 'Votre liste a été vidée');
-                        }
-                    },
-                },
-            ]
-        );
-    };
-
-    const SettingItem = ({ icon, title, onPress, showBadge, badgeCount, iconColor = colors.textSecondary }) => (
-        <TouchableOpacity
-            style={styles.settingItem}
-            onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                onPress();
-            }}
-        >
-            <View style={styles.settingLeft}>
-                <Icon name={icon} size={24} color={iconColor} style={styles.settingIcon} />
-                <Text style={styles.settingTitle}>{title}</Text>
-            </View>
-            <View style={styles.settingRight}>
-                {showBadge && badgeCount > 0 && (
+    const ActionButton = ({ icon, label, onPress, badge }) => (
+        <TouchableOpacity style={styles.actionButton} onPress={onPress}>
+            <View style={[styles.actionIconContainer, badge && styles.badgeContainer]}>
+                <Icon name={icon} size={24} color={colors.white} />
+                {badge > 0 && (
                     <View style={styles.badge}>
-                        <Text style={styles.badgeText}>{badgeCount}</Text>
+                        <Text style={styles.badgeText}>{badge}</Text>
                     </View>
                 )}
-                <Icon name="chevron-forward" size={20} color={colors.textTertiary} />
             </View>
+            <Text style={styles.actionLabel}>{label}</Text>
         </TouchableOpacity>
     );
 
-    // Use profile data if available, otherwise fallback to user object or defaults
-    const displayUser = profile || user || {};
+    const MenuRow = ({ icon, label, onPress }) => (
+        <TouchableOpacity style={styles.menuRow} onPress={onPress}>
+            <View style={styles.menuRowLeft}>
+                <Icon name={icon} size={24} color={colors.textSecondary} style={styles.menuIcon} />
+                <Text style={styles.menuLabel}>{label}</Text>
+            </View>
+            <Icon name="chevron-forward" size={16} color={colors.textTertiary} />
+        </TouchableOpacity>
+    );
 
     return (
         <SafeAreaView style={styles.safeArea}>
             <StatusBar barStyle="light-content" />
 
-            <ScrollView style={styles.scrollView}>
-                {/* Header with Gradient */}
-                <LinearGradient
-                    colors={[colors.gradientStart, colors.gradientEnd]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.header}
-                >
-                    <View style={styles.profileSection}>
-                        <Image
-                            source={{ uri: displayUser.avatar || 'https://via.placeholder.com/100/DC2626/FFFFFF?text=U' }}
-                            style={styles.avatar}
-                        />
-                        <Text style={styles.userName}>{displayUser.name || 'Utilisateur'}</Text>
-                        <Text style={styles.userEmail}>{displayUser.email || user?.email || 'email@example.com'}</Text>
-
-                        <View style={styles.subscriptionBadge}>
-                            <Icon name="star" size={16} color={colors.star} style={styles.starIcon} />
-                            <Text style={styles.subscriptionText}>
-                                {displayUser.subscription === 'premium' ? 'Premium' : 'Free'}
-                            </Text>
-                        </View>
+            {/* Header / Profile Summary */}
+            <View style={styles.header}>
+                <View style={styles.headerTop}>
+                    <Text style={styles.headerTitle}>My Netflix</Text>
+                    <View style={styles.headerIcons}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Search')}>
+                            <Icon name="search" size={24} color={colors.white} style={{ marginRight: 20 }} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => { }}>
+                            <Icon name="menu" size={24} color={colors.white} />
+                        </TouchableOpacity>
                     </View>
-                </LinearGradient>
-
-                {/* My List Section */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Ma Liste</Text>
-                    <SettingItem
-                        icon="list-outline"
-                        title="Voir Ma Liste"
-                        onPress={() => navigation.navigate('MyList')}
-                        showBadge={true}
-                        badgeCount={watchlist.length}
-                    />
-                    {watchlist.length > 0 && (
-                        <SettingItem
-                            icon="trash-outline"
-                            title="Vider Ma Liste"
-                            onPress={handleClearWatchlist}
-                            iconColor={colors.error}
-                        />
-                    )}
                 </View>
 
-                {/* Account Settings */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Compte</Text>
-                    <SettingItem
-                        icon="person-outline"
-                        title="Informations du Profil"
-                        onPress={() => Alert.alert('Info', 'Feature coming soon!')}
+                <View style={styles.profileCard}>
+                    <Image
+                        source={{ uri: 'https://via.placeholder.com/100/E50914/FFFFFF?text=U' }} // Default avatar
+                        style={styles.avatar}
                     />
-                    <SettingItem
-                        icon="key-outline"
-                        title="Changer le Mot de Passe"
-                        onPress={() => Alert.alert('Info', 'Feature coming soon!')}
-                    />
-                    <SettingItem
-                        icon="card-outline"
-                        title="Abonnement & Paiement"
-                        onPress={() => Alert.alert('Info', 'Feature coming soon!')}
+                    <View style={styles.profileInfo}>
+                        <Text style={styles.profileName}>{user?.name || 'User'}</Text>
+                        <Text style={styles.profileHandle}>{user?.email || 'user@example.com'}</Text>
+                    </View>
+                    <Icon name="chevron-forward" size={20} color={colors.textSecondary} />
+                </View>
+            </View>
+
+            <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+
+                {/* Quick Actions Row */}
+                <View style={styles.actionsRow}>
+                    <ActionButton icon="notifications" label="Notifications" badge={2} onPress={() => { }} />
+                    <ActionButton icon="download" label="Downloads" onPress={() => { }} />
+                </View>
+
+                {/* Content Sections */}
+
+                {/* My List Preview */}
+                <View style={styles.sectionContainer}>
+                    <NetflixRow
+                        title="My List"
+                        mediaList={watchlist}
+                        size="medium"
+                        onSeeAll={() => navigation.navigate('MyList')}
                     />
                 </View>
 
-                {/* App Settings */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Paramètres</Text>
-                    <SettingItem
-                        icon="notifications-outline"
-                        title="Notifications"
-                        onPress={() => Alert.alert('Info', 'Feature coming soon!')}
-                    />
-                    <SettingItem
-                        icon="download-outline"
-                        title="Téléchargements"
-                        onPress={() => Alert.alert('Info', 'Feature coming soon!')}
-                    />
-                    <SettingItem
-                        icon="language-outline"
-                        title="Langue"
-                        onPress={() => Alert.alert('Info', 'Feature coming soon!')}
-                    />
-                    <SettingItem
-                        icon="contrast-outline"
-                        title="Apparence"
-                        onPress={() => Alert.alert('Info', 'Feature coming soon!')}
-                    />
+                {/* Settings & More */}
+                <View style={styles.menuContainer}>
+                    <MenuRow icon="settings-outline" label="App Settings" onPress={() => { }} />
+                    <MenuRow icon="person-outline" label="Account" onPress={() => { }} />
+                    <MenuRow icon="help-circle-outline" label="Help" onPress={() => { }} />
+                    <MenuRow icon="log-out-outline" label="Sign Out" onPress={handleLogout} />
                 </View>
 
-                {/* Help & Support */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Aide & Support</Text>
-                    <SettingItem
-                        icon="help-circle-outline"
-                        title="Centre d'Aide"
-                        onPress={() => Alert.alert('Info', 'Feature coming soon!')}
-                    />
-                    <SettingItem
-                        icon="mail-outline"
-                        title="Nous Contacter"
-                        onPress={() => Alert.alert('Info', 'Feature coming soon!')}
-                    />
-                    <SettingItem
-                        icon="document-text-outline"
-                        title="Conditions d'Utilisation"
-                        onPress={() => Alert.alert('Info', 'Feature coming soon!')}
-                    />
-                    <SettingItem
-                        icon="shield-checkmark-outline"
-                        title="Politique de Confidentialité"
-                        onPress={() => Alert.alert('Info', 'Feature coming soon!')}
-                    />
+                <View style={styles.footer}>
+                    <Text style={styles.versionText}>Version 1.0.1 • Media243 Mobile</Text>
                 </View>
 
-                {/* Logout Button */}
-                <View style={styles.logoutSection}>
-                    <Button
-                        variant="outline"
-                        title="Se Déconnecter"
-                        icon="log-out-outline"
-                        iconPosition="left"
-                        onPress={handleLogout}
-                        style={styles.logoutButton}
-                    />
-
-                    <Text style={styles.versionText}>Version 1.0.0</Text>
-                </View>
+                <View style={{ height: 100 }} />
             </ScrollView>
         </SafeAreaView>
     );
@@ -241,114 +121,125 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.background,
     },
+    header: {
+        paddingHorizontal: spacing.base,
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : spacing.xl,
+        paddingBottom: spacing.lg,
+    },
+    headerTop: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: spacing.xl,
+    },
+    headerTitle: {
+        ...typography.styles.h2,
+        color: colors.white,
+    },
+    headerIcons: {
+        flexDirection: 'row',
+    },
+    profileCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        // No background, just clean layout
+    },
+    avatar: {
+        width: 60,
+        height: 60,
+        borderRadius: 4, // Netflix uses square-ish avatars now
+        marginRight: spacing.base,
+    },
+    profileInfo: {
+        flex: 1,
+    },
+    profileName: {
+        ...typography.styles.h4,
+        color: colors.white,
+        marginBottom: 2,
+    },
+    profileHandle: {
+        ...typography.styles.caption,
+        color: colors.textSecondary,
+    },
     scrollView: {
         flex: 1,
     },
-    header: {
-        paddingVertical: spacing['4xl'],
+    actionsRow: {
+        flexDirection: 'row',
         paddingHorizontal: spacing.base,
+        marginBottom: spacing.xl,
+        gap: spacing.base,
     },
-    profileSection: {
-        alignItems: 'center',
-    },
-    avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        borderWidth: 4,
-        borderColor: colors.textPrimary,
-        marginBottom: spacing.base,
-    },
-    userName: {
-        ...typography.styles.h3,
-        color: colors.textPrimary,
-        marginBottom: spacing.xs,
-    },
-    userEmail: {
-        ...typography.styles.body,
-        color: colors.white20,
-        marginBottom: spacing.base,
-    },
-    subscriptionBadge: {
+    actionButton: {
+        flex: 1, // Equal width
+        backgroundColor: '#262626', // Dark button color
+        borderRadius: 30, // Pill shape
+        paddingVertical: 10,
+        paddingHorizontal: 16,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: colors.black50,
-        paddingHorizontal: spacing.base,
-        paddingVertical: spacing.sm,
-        borderRadius: spacing.borderRadius.full,
+        justifyContent: 'center',
+        height: 48,
     },
-    starIcon: {
-        marginRight: spacing.xs,
+    actionIconContainer: {
+        marginRight: spacing.sm,
     },
-    subscriptionText: {
-        ...typography.styles.bodySmall,
-        color: colors.textPrimary,
-        fontWeight: typography.fontWeight.bold,
-        textTransform: 'uppercase',
+    badge: {
+        position: 'absolute',
+        top: -4,
+        right: -6,
+        backgroundColor: colors.primary,
+        width: 16,
+        height: 16,
+        borderRadius: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1.5,
+        borderColor: '#262626',
     },
-    section: {
-        paddingTop: spacing.xl,
-        paddingBottom: spacing.base,
+    badgeText: {
+        fontSize: 9,
+        fontWeight: 'bold',
+        color: colors.white,
     },
-    sectionTitle: {
-        ...typography.styles.h4,
-        color: colors.textSecondary,
-        paddingHorizontal: spacing.base,
+    actionLabel: {
+        ...typography.styles.body,
+        fontWeight: '600',
+        color: colors.white,
+    },
+    sectionContainer: {
         marginBottom: spacing.md,
     },
-    settingItem: {
+    menuContainer: {
+        paddingHorizontal: spacing.base,
+    },
+    menuRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: spacing.base,
-        paddingHorizontal: spacing.base,
+        paddingVertical: spacing.lg,
         borderBottomWidth: 1,
-        borderBottomColor: colors.border,
+        borderBottomColor: '#262626',
     },
-    settingLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1,
-    },
-    settingIcon: {
-        marginRight: spacing.md,
-    },
-    settingTitle: {
-        ...typography.styles.body,
-        color: colors.textPrimary,
-    },
-    settingRight: {
+    menuRowLeft: {
         flexDirection: 'row',
         alignItems: 'center',
     },
-    badge: {
-        backgroundColor: colors.primary,
-        borderRadius: spacing.borderRadius.full,
-        minWidth: 24,
-        height: 24,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: spacing.sm,
-        paddingHorizontal: spacing.xs,
+    menuIcon: {
+        marginRight: spacing.lg,
     },
-    badgeText: {
-        ...typography.styles.caption,
+    menuLabel: {
+        ...typography.styles.bodyLarge,
         color: colors.textPrimary,
-        fontWeight: typography.fontWeight.bold,
     },
-    logoutSection: {
-        paddingHorizontal: spacing.base,
-        paddingVertical: spacing['2xl'],
+    footer: {
+        paddingVertical: spacing.xl,
         alignItems: 'center',
-    },
-    logoutButton: {
-        width: '100%',
-        borderColor: colors.error,
     },
     versionText: {
-        ...typography.styles.caption,
         color: colors.textTertiary,
-        marginTop: spacing.xl,
+        fontSize: 12,
     },
 });
 

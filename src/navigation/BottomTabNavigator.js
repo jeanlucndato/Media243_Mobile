@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Platform } from 'react-native';
 
 // Import screens
+import colors from '../constants/colors';
 import HomePage from '../screens/HomeScreen';
 import MyListScreen from '../screens/MyListScreen';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -12,63 +14,95 @@ const Tab = createBottomTabNavigator();
 const BottomTabNavigator = () => {
     return (
         <Tab.Navigator
-            initialRouteName="Accueil"
+            initialRouteName="Home"
             screenOptions={{
                 headerShown: false,
                 tabBarStyle: {
-                    backgroundColor: '#000',
-                    borderTopColor: '#222',
-                    paddingBottom: 5,
-                    height: 60,
+                    backgroundColor: colors.bottomTab,
+                    borderTopColor: 'transparent',
+                    height: Platform.OS === 'ios' ? 85 : 60,
+                    paddingBottom: Platform.OS === 'ios' ? 30 : 10,
+                    paddingTop: 10,
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    elevation: 0,
+                    opacity: 0.96, // Slight transparency
                 },
-                tabBarActiveTintColor: '#E50914',
-                tabBarInactiveTintColor: '#808080',
+                tabBarActiveTintColor: colors.textPrimary, // Netflix uses white for active
+                tabBarInactiveTintColor: colors.textSecondary, // Grey for inactive
+                tabBarLabelStyle: {
+                    fontSize: 8,
+                    fontWeight: '500',
+                    marginTop: -4,
+                },
             }}
         >
             {/* Home Screen */}
             <Tab.Screen
-                name="Accueil"
+                name="Home"
                 component={HomePage}
                 options={{
-                    tabBarLabel: 'Accueil',
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="home-outline" color={color} size={size} />
+                    tabBarLabel: 'Home',
+                    tabBarIcon: ({ color, focused }) => (
+                        <Ionicons
+                            name={focused ? "home" : "home-outline"}
+                            color={color}
+                            size={24}
+                        />
                     ),
                 }}
             />
 
-            {/* Search Screen */}
+            {/* Search/New & Hot typically, keeping Search for now */}
             <Tab.Screen
-                name="Recherche"
+                name="Search"
                 component={SearchPage}
                 options={{
-                    tabBarLabel: 'Recherche',
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="search-outline" color={color} size={size} />
+                    tabBarLabel: 'Search',
+                    tabBarIcon: ({ color, focused }) => (
+                        <Ionicons
+                            name={focused ? "search" : "search-outline"}
+                            color={color}
+                            size={24}
+                        />
                     ),
                 }}
             />
 
-            {/* My List Screen */}
+            {/* My List / Downloads */}
             <Tab.Screen
                 name="MyList"
                 component={MyListScreen}
                 options={{
-                    tabBarLabel: 'Ma Liste',
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="list-outline" color={color} size={size} />
+                    tabBarLabel: 'My Netflix', // Changing label to match modern Netflix "My Netflix" hub
+                    tabBarIcon: ({ color, focused }) => (
+                        <Ionicons
+                            name={focused ? "person-circle" : "person-circle-outline"} // Netflix uses avatar often, using circle icon for now
+                            color={color}
+                            size={24}
+                        />
                     ),
                 }}
             />
 
-            {/* Profile Screen */}
+            {/* Profile/More -> Often merged into "My Netflix" in new UI, let's keep separate for structure but maybe rename to "More" or keep Profile */}
+            {/* Actually, Netflix 2024 has: Home, New & Hot, My Netflix. simpler. 
+               We have 4 screens. Let's keep Profile appearing as Menu or similar.
+               But user had "ProfileScreen". Let's stick to standard recognizable tabs.
+            */}
             <Tab.Screen
-                name="Profil"
+                name="Menu"
                 component={ProfileScreen}
                 options={{
-                    tabBarLabel: 'Profil',
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="person-outline" color={color} size={size} />
+                    tabBarLabel: 'Menu',
+                    tabBarIcon: ({ color, focused }) => (
+                        <Ionicons
+                            name={focused ? "menu" : "menu-outline"}
+                            color={color}
+                            size={24}
+                        />
                     ),
                 }}
             />

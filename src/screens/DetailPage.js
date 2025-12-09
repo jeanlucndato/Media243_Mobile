@@ -4,7 +4,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import NetflixRow from '../components/NetflixRow';
 import colors from '../constants/colors';
 import { spacing } from '../constants/spacing';
 import { typography } from '../constants/typography';
@@ -222,14 +221,32 @@ const DetailScreen = () => {
                         </TouchableOpacity>
                     </View>
 
-                    {/* Similar Content */}
+                    {/* Similar Content - Grid Layout */}
                     {similarMovies.length > 0 && (
                         <View style={styles.similarSection}>
-                            <NetflixRow
-                                title="Titres similaires"
-                                mediaList={similarMovies}
-                                size="medium"
-                            />
+                            <View style={styles.sectionHeader}>
+                                <View style={styles.sectionIndicator} />
+                                <Text style={styles.sectionTitle}>Plus de titres</Text>
+                            </View>
+
+                            <View style={styles.gridContainer}>
+                                {similarMovies.map((item) => (
+                                    <TouchableOpacity
+                                        key={item.id}
+                                        style={styles.gridItem}
+                                        onPress={() => navigation.push('Detail', { id: item.id })}
+                                    >
+                                        <Image
+                                            source={{ uri: item.poster_url || 'https://via.placeholder.com/150' }}
+                                            style={styles.gridImage}
+                                            resizeMode="cover"
+                                        />
+                                        <View style={styles.gridOverlay}>
+                                            <Icon name="play-circle-outline" size={32} color={colors.white} style={{ opacity: 0.8 }} />
+                                        </View>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
                         </View>
                     )}
                 </View>
@@ -482,8 +499,50 @@ const styles = StyleSheet.create({
         fontWeight: typography.fontWeight.semibold,
     },
     similarSection: {
-        marginTop: spacing.lg,
+        marginTop: spacing.xl,
         marginBottom: spacing['6xl'],
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: spacing.md,
+    },
+    sectionIndicator: {
+        width: 4,
+        height: 20,
+        backgroundColor: colors.primary, // Red vertical bar
+        marginRight: spacing.sm,
+        borderRadius: 2,
+    },
+    sectionTitle: {
+        ...typography.styles.h4,
+        color: colors.textPrimary,
+        fontWeight: 'bold',
+    },
+    gridContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-start',
+        gap: 8, // Gap between items
+    },
+    gridItem: {
+        width: (width - 32 - 16) / 3, // (Screen width - padding - gaps) / 3 columns
+        aspectRatio: 2 / 3,
+        borderRadius: 4,
+        backgroundColor: colors.backgroundCard,
+        overflow: 'hidden',
+        marginBottom: 8,
+    },
+    gridImage: {
+        width: '100%',
+        height: '100%',
+    },
+    gridOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        opacity: 0, // Hidden by default, could show on press
     },
 });
 

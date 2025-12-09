@@ -46,7 +46,7 @@ const NetflixMediaCard = ({ media, navigation, showTop10, top10Number, size = 'm
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
             onPress={() => navigation.navigate('Detail', { id: media.id })}
-            activeOpacity={0.9}
+            activeOpacity={0.7} // Standard touch feedback
         >
             <Animated.View
                 style={[
@@ -62,27 +62,8 @@ const NetflixMediaCard = ({ media, navigation, showTop10, top10Number, size = 'm
                     resizeMode="cover"
                 />
 
-                {/* Enhanced overlay with gradient */}
-                <View style={styles.overlay}>
-                    <View style={styles.playButton}>
-                        <Icon name="play" size={24} color={colors.textPrimary} />
-                    </View>
-                </View>
-
-                {/* Enhanced rating badge */}
-                {media.rating && (
-                    <View style={styles.ratingBadge}>
-                        <Icon name="star" size={12} color={colors.star} style={styles.starIcon} />
-                        <Text style={styles.ratingText}>{media.rating}</Text>
-                    </View>
-                )}
-
-                {/* Title overlay at bottom */}
-                <View style={styles.titleOverlay}>
-                    <Text style={styles.titleText} numberOfLines={1}>
-                        {media.title}
-                    </Text>
-                </View>
+                {/* Netflix recently added a subtle 'New Episodes' or 'N' logo sometimes, but for now clean is best */}
+                {/* Removed Play Button Overlay & Star Ratings to match Netflix Mobile Home */}
             </Animated.View>
         </TouchableOpacity>
     );
@@ -162,75 +143,16 @@ const styles = StyleSheet.create({
         gap: spacing.sm,
     },
     cardContainer: {
-        borderRadius: spacing.borderRadius.base,
+        borderRadius: 4, // Netflix is sharper
         overflow: 'hidden',
-        marginRight: spacing.sm,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.7,
-        shadowRadius: 12,
-        elevation: 12,
+        marginRight: 8, // Tighter spacing
         backgroundColor: colors.backgroundCard,
     },
     cardImage: {
         width: '100%',
         height: '100%',
     },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        opacity: 0,
-    },
-    playButton: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: colors.textPrimary,
-    },
-    ratingBadge: {
-        position: 'absolute',
-        top: spacing.sm,
-        right: spacing.sm,
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
-        paddingHorizontal: spacing.sm,
-        paddingVertical: spacing.xs,
-        borderRadius: spacing.borderRadius.sm,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 215, 0, 0.3)',
-    },
-    starIcon: {
-        marginRight: 2,
-    },
-    ratingText: {
-        ...typography.styles.caption,
-        color: colors.textPrimary,
-        fontWeight: typography.fontWeight.bold,
-    },
-    titleOverlay: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
-        paddingHorizontal: spacing.sm,
-        paddingVertical: spacing.xs,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(220, 38, 38, 0.3)',
-    },
-    titleText: {
-        ...typography.styles.caption,
-        color: colors.textPrimary,
-        fontWeight: typography.fontWeight.semibold,
-        textAlign: 'center',
-    },
+    // Removed unused overlay, playButton, ratingBadge, titleOverlay styles
 });
 
 export default NetflixRow;

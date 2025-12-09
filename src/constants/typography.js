@@ -2,14 +2,14 @@
 export const typography = {
     // Font Sizes
     fontSize: {
-        xs: 12,
-        sm: 14,
-        base: 16,
-        lg: 18,
+        xs: 10,
+        sm: 12,
+        base: 14,
+        lg: 16,
         xl: 20,
         '2xl': 24,
-        '3xl': 30,
-        '4xl': 36,
+        '3xl': 32,
+        '4xl': 40,
         '5xl': 48,
     },
 
@@ -19,69 +19,65 @@ export const typography = {
         medium: '500',
         semibold: '600',
         bold: '700',
-        extrabold: '800',
+        extraBold: '800', // Common for Netflix Titles
         black: '900',
     },
 
     // Line Heights
     lineHeight: {
-        tight: 1.2,
-        normal: 1.5,
-        relaxed: 1.7,
-        loose: 2,
+        tight: 1.1, // Closer for titles
+        normal: 1.4,
+        relaxed: 1.6,
     },
 
     // Predefined Text Styles
     styles: {
         h1: {
-            fontSize: 36,
+            fontSize: 40,
             fontWeight: '900',
-            lineHeight: 1.2,
+            lineHeight: 44,
         },
         h2: {
-            fontSize: 30,
-            fontWeight: '800',
-            lineHeight: 1.3,
+            fontSize: 32,
+            fontWeight: '700',
+            lineHeight: 36,
         },
         h3: {
             fontSize: 24,
             fontWeight: '700',
-            lineHeight: 1.3,
+            lineHeight: 28,
         },
         h4: {
             fontSize: 20,
-            fontWeight: '700',
-            lineHeight: 1.4,
+            fontWeight: '600',
+            lineHeight: 24,
         },
         body: {
-            fontSize: 16,
-            fontWeight: '400',
-            lineHeight: 1.5,
-        },
-        bodyLarge: {
-            fontSize: 18,
-            fontWeight: '400',
-            lineHeight: 1.6,
-        },
-        bodySmall: {
             fontSize: 14,
             fontWeight: '400',
-            lineHeight: 1.5,
+            lineHeight: 20,
         },
-        caption: {
+        bodyLarge: {
+            fontSize: 16,
+            fontWeight: '400',
+            lineHeight: 24,
+        },
+        bodySmall: {
             fontSize: 12,
             fontWeight: '400',
-            lineHeight: 1.4,
+            lineHeight: 16,
+        },
+        caption: {
+            fontSize: 10,
+            fontWeight: '500', // Netflix uses slightly bolder captions often
+            lineHeight: 14,
+            letterSpacing: 0.2,
         },
         button: {
             fontSize: 16,
-            fontWeight: '700',
-            lineHeight: 1.2,
-        },
-        buttonLarge: {
-            fontSize: 18,
-            fontWeight: '700',
-            lineHeight: 1.2,
+            fontWeight: '600',
+            lineHeight: 20,
+            letterSpacing: 0.5,
         },
     },
 };
