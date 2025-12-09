@@ -76,7 +76,7 @@ const BottomTabNavigator = () => {
                 name="MyList"
                 component={MyListScreen}
                 options={{
-                    tabBarLabel: 'My Netflix', // Changing label to match modern Netflix "My Netflix" hub
+                    tabBarLabel: 'My Media243', // Changing label to match modern Media243 "My Media243" hub
                     tabBarIcon: ({ color, focused }) => (
                         <Ionicons
                             name={focused ? "person-circle" : "person-circle-outline"} // Netflix uses avatar often, using circle icon for now

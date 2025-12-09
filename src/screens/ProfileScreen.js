@@ -54,7 +54,7 @@ const ProfileScreen = () => {
             {/* Header / Profile Summary */}
             <View style={styles.header}>
                 <View style={styles.headerTop}>
-                    <Text style={styles.headerTitle}>My Netflix</Text>
+                    <Text style={styles.headerTitle}>My Media243</Text>
                     <View style={styles.headerIcons}>
                         <TouchableOpacity onPress={() => navigation.navigate('Search')}>
                             <Icon name="search" size={24} color={colors.white} style={{ marginRight: 20 }} />
@@ -82,8 +82,17 @@ const ProfileScreen = () => {
 
                 {/* Quick Actions Row */}
                 <View style={styles.actionsRow}>
-                    <ActionButton icon="notifications" label="Notifications" badge={2} onPress={() => { }} />
-                    <ActionButton icon="download" label="Downloads" onPress={() => { }} />
+                    <ActionButton
+                        icon="notifications"
+                        label="Notifications"
+                        badge={2}
+                        onPress={() => navigation.navigate('Notifications')}
+                    />
+                    <ActionButton
+                        icon="download"
+                        label="Downloads"
+                        onPress={() => navigation.navigate('Downloads')}
+                    />
                 </View>
 
                 {/* Content Sections */}
@@ -100,9 +109,21 @@ const ProfileScreen = () => {
 
                 {/* Settings & More */}
                 <View style={styles.menuContainer}>
-                    <MenuRow icon="settings-outline" label="App Settings" onPress={() => { }} />
-                    <MenuRow icon="person-outline" label="Account" onPress={() => { }} />
-                    <MenuRow icon="help-circle-outline" label="Help" onPress={() => { }} />
+                    <MenuRow
+                        icon="settings-outline"
+                        label="App Settings"
+                        onPress={() => navigation.navigate('AppSettings')}
+                    />
+                    <MenuRow
+                        icon="person-outline"
+                        label="Account"
+                        onPress={() => navigation.navigate('Account')}
+                    />
+                    <MenuRow
+                        icon="help-circle-outline"
+                        label="Help"
+                        onPress={() => navigation.navigate('Help')}
+                    />
                     <MenuRow icon="log-out-outline" label="Sign Out" onPress={handleLogout} />
                 </View>
 

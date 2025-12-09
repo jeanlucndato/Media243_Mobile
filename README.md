@@ -1,50 +1,78 @@
-# Welcome to your Expo app 👋
+# Media243 Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Media243 Mobile is a premium streaming application built with React Native and Expo. While **Media243** is the platform brand, the app features a sleek, dark-themed UI and user experience inspired by industry leaders like Netflix. It delivers a high-quality, immersive mobile entertainment experience optimized for modern streaming.
 
-## Get started
+## 📱 Features
 
-1. Install dependencies
+### Core Experience
+*   **Media Billboard**: An immersive hero section on the home screen featuring top trending content with a cinematic bottom-up gradient.
+*   **Content Browsing**: Horizontal scrolling rows for different categories (Trending, Popular, Top 10) with clean media cards.
+*   **Top 10 Badge**: A signature stylized "Top 10" ranking badge for popular content.
 
-   ```bash
-   npm install
-   ```
+### Navigation & Discovery
+*   **Home Tab**: The main feed for discovering new content.
+*   **Search Tab**: A dedicated search experience featuring a "Top Searches" list for quick access and a grid layout for results.
+*   **Detail View**: comprehensive info pages for movies and shows, including metadata (match %, year, rating), play/download actions, and a "More Like This" grid.
 
-2. Start the app
+### Personalized Hub ("My Media243")
+*   **Profile Screen**: A unified hub displaying user details, quick actions (Notifications, Downloads), and a preview of the personal watchlist ("My List").
+*   **My List**: A dedicated screen to manage saved movies and shows, presented in a clean 3-column grid layout.
 
-   ```bash
-   npx expo start
-   ```
+### Technical & UI Highlights
+*   **Dark Mode First**: Built with a "True Black" background (#000000) for OLED optimization and reduced eye strain.
+*   **Media243 Red**: Uses the signature #E50914 red for primary actions and accents (inspired by Netflix's color palette).
+*   **Netflix-Inspired UI**: Clean, immersive interface patterns and interactions modeled after Netflix's mobile experience.
+*   **Haptic Feedback**: Meaningful tactile feedback on interactions using `expo-haptics`.
+*   **Custom Typography**: A carefully tuned type system for readability and brand consistency.
 
-In the output, you'll find options to open the app in a
+## 🛠 Tech Stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+*   **Framework**: [React Native](https://reactnative.dev/) with [Expo SDK](https://expo.dev/).
+*   **Navigation**: [React Navigation](https://reactnavigation.org/) (Native Stack & Bottom Tabs).
+*   **Styling**: `StyleSheet` with a custom Design System (Colors, Typography, Spacing constants).
+*   **Icons**: `react-native-vector-icons` (Ionicons).
+*   **Gradients**: `expo-linear-gradient`.
+*   **Video**: `expo-av` for content playback.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🚀 Getting Started
 
-## Get a fresh project
+### Prerequisites
+*   Node.js installed.
+*   Expo Go app installed on your physical device OR an Android/iOS emulator set up.
 
-When you're ready, run:
+### Installation
 
-```bash
-npm run reset-project
+1.  **Clone the repository** (if applicable) or navigate to the project folder.
+
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
+
+3.  **Start the development server**:
+    ```bash
+    npx expo start
+    ```
+
+4.  **Run the app**:
+    *   **Physical Device**: Scan the QR code with the Expo Go app (Android) or Camera app (iOS).
+    *   **Emulator**: Press `a` for Android or `i` for iOS in the terminal.
+
+## 📂 Project Structure
+
+```
+src/
+├── components/      # Reusable UI components (NetflixRow, Billboard, Button, etc.)
+├── constants/       # Design tokens (colors.js, typography.js, spacing.js)
+├── contexts/        # Global state (AuthContext, MediaContext)
+├── navigation/      # Navigation configuration (AppNavigation, BottomTabNavigator)
+├── screens/         # Screen components (Home, Search, Detail, Profile, MyList, Auth)
+└── services/        # API calls and data fetching logic
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🤝 Contributing
 
-## Learn more
+This is a proprietary project for Media243. Please ensure you follow the existing design guidelines and code style when contributing.
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+*Built for the love of cinema. 🍿*
